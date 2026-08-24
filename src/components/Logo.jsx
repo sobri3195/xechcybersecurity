@@ -1,2 +1,6 @@
 import { Link } from 'react-router-dom'
-export default function Logo({className=''}){return <Link to="/" className={`inline-flex items-center gap-2 font-mono text-lg font-bold focus-ring ${className}`} aria-label="Xech Cyber Security — Home"><svg aria-hidden="true" viewBox="0 0 40 44" className="h-9 w-9"><path d="M20 2 37 8v12c0 11-7 18-17 22C10 38 3 31 3 20V8z" fill="none" stroke="#F02D4F" strokeWidth="2"/><path d="m13 13 14 17m0-17L13 30" stroke="#FF365C" strokeWidth="2.5"/><circle cx="20" cy="21.5" r="2" fill="#fff"/></svg><span><span className="text-neon">Xech</span> <span className="text-copy">Cyber</span></span></Link>}
+export default function Logo() {
+  return <Link className="logo" to="/" aria-label="Xech Cyber Security — Home">
+    <picture><source media="(max-width: 390px)" srcSet="/brand/xech-cyber-mark.svg"/><img src="/brand/xech-cyber-logo-horizontal.svg" alt="Xech Cyber Security" /></picture>
+  </Link>
+}

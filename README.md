@@ -1,61 +1,138 @@
-# Xech Cyber Security
+<p align="center">
+  <img src="./public/brand/xech-cyber-logo-horizontal.svg" alt="Xech Cyber Security" width="360">
+</p>
 
-Company profile multipage bertema cyber-industrial untuk **Xech Cyber Security**, dibangun ulang dengan React dan Vite. Aplikasi mencakup Home, About, Services, Contact, internal 404, formulir tervalidasi, metadata SEO, animasi yang menghormati reduced-motion, dan konfigurasi Vercel.
+# Xech Cyber Security Website
 
-## Prasyarat
+Website company profile dan lead-generation untuk layanan keamanan siber, dibangun menggunakan React, Vite, dan Tailwind CSS.
 
-- Node.js 20 atau lebih baru
-- npm 10 atau lebih baru
+| React | Vite | Tailwind CSS | Vercel Ready | License |
+| --- | --- | --- | --- | --- |
+| UI components | Build tooling | Styling | SPA rewrite tersedia | All rights reserved |
 
-## Menjalankan secara lokal
+## Features
+
+- Responsive multipage interface dan React Router
+- Reusable service components dan accessible mobile navigation
+- Contact-form validation (simulasi frontend)
+- SEO metadata, original SVG logo system, dan complete favicon support
+- Reduced-motion support, Vercel SPA rewrite, dan security headers dasar
+
+## Tech stack
+
+| Teknologi | Kegunaan |
+| --- | --- |
+| React | Antarmuka berbasis komponen |
+| React Router | Routing client-side dan internal 404 |
+| Vite | Development server dan production build |
+| Tailwind CSS | Tooling CSS; stylesheet proyek juga memakai token CSS khusus |
+| Vercel | Target hosting dan SPA rewrite |
+
+## Project structure
+
+```text
+.
+├── public/
+│   ├── brand/                 # Sistem logo SVG
+│   ├── favicon/               # Sumber SVG, manifest, browser config
+│   ├── robots.txt
+│   └── sitemap.xml
+├── scripts/
+│   └── generate-favicons.cjs  # Generator PNG/ICO tanpa dependency
+├── src/
+│   ├── components/Logo.jsx
+│   ├── data/services.js
+│   ├── pages/                 # Home, About, Services, Contact, 404
+│   ├── main.jsx
+│   └── styles.css
+├── .env.example
+├── index.html
+├── PRD.md
+├── vercel.json
+└── vite.config.js
+```
+
+## Getting started
 
 ```bash
+git clone <repository-url>
+cd xech-cyber-security
 npm install
 npm run dev
 ```
 
-Buka URL lokal yang ditampilkan Vite. Untuk build dan memeriksa hasil production:
+Ganti `<repository-url>` dengan URL repository sebenarnya.
+
+## Available scripts
 
 ```bash
-npm run build
-npm run preview
+npm run generate:favicons # membuat seluruh turunan PNG dan ICO
+npm run dev               # membuat favicon lalu menjalankan development server
+npm run build             # membuat favicon dan production build ke dist/
+npm run preview           # preview production build
 ```
 
-## Deploy ke Vercel
+## Environment variables
 
-1. Push repository ke penyedia Git.
+Salin `.env.example` menjadi `.env` bila integrasi diperlukan:
+
+```env
+VITE_CONTACT_API_URL=
+VITE_SITE_URL=https://your-domain.example
+```
+
+Semua variabel Vite berawalan `VITE_` tersedia di browser. Jangan pernah menyimpan secret, token privat, atau kredensial pada variabel tersebut.
+
+## Contact-form integration
+
+Form v1.0 masih frontend-only: loading dan success state disimulasikan, sedangkan error validasi ditampilkan di sisi klien. Untuk integrasi, baca `VITE_CONTACT_API_URL`, kirim payload melalui HTTPS, lalu petakan respons endpoint ke loading, success, dan error state. Endpoint wajib menerapkan validasi server-side, rate limiting, dan spam protection. Jangan mengirim API secret dari frontend.
+
+## Deployment to Vercel
+
+1. Push repository ke GitHub, GitLab, atau Bitbucket.
 2. Import repository di Vercel.
-3. Gunakan preset **Vite** (build command `npm run build`, output `dist`).
-4. Deploy. `vercel.json` mengarahkan seluruh route ke `index.html`, sehingga refresh langsung pada `/about`, `/services`, dan `/contact` tetap ditangani React Router. File yang sama juga menerapkan header keamanan dasar.
+3. Pilih framework preset **Vite**.
+4. Gunakan build command `npm run build`.
+5. Gunakan output directory `dist`.
+6. Tambahkan environment variables yang diperlukan.
+7. Deploy.
+8. Uji direct URL dan refresh seluruh route.
 
-Ganti domain placeholder `https://example.com` pada canonical URL, Open Graph, JSON-LD, `public/robots.txt`, dan `public/sitemap.xml` sebelum publikasi.
+`vercel.json` mengarahkan seluruh request route ke `index.html` agar React Router dapat menangani direct navigation, serta menambahkan security headers dasar.
 
-## Mengubah konten
+## Brand assets
 
-- Informasi kontak: cari `info@xechcybersecurity.com` dan `+62 812 3456 7890` di `src/pages/Contact.jsx`, `src/components/Footer.jsx`, dan structured data di Home.
-- Data layanan terpusat di `src/data/services.js`.
-- Warna dan design token berada di `tailwind.config.js` dan `src/index.css`.
-
-## Integrasi form
-
-Form saat ini sengaja hanya menyimulasikan validasi dan loading; tidak ada data yang dikirim atau disimpan. Isi URL endpoint produksi pada variabel berikut:
-
-```bash
-VITE_CONTACT_API_URL=https://endpoint-anda.example/contact
+```text
+public/
+├── brand/
+│   ├── xech-cyber-mark.svg
+│   ├── xech-cyber-logo-horizontal.svg
+│   ├── xech-cyber-logo-horizontal-light.svg
+│   ├── xech-cyber-logo-stacked.svg
+│   ├── xech-cyber-wordmark.svg
+│   ├── xech-cyber-logo-monochrome.svg
+│   └── logo-preview.svg
+└── favicon/
 ```
 
-Kemudian implementasikan request pada komentar integrasi di `src/components/ContactForm.jsx`. Variabel `VITE_` dapat dibaca pengguna browser, jadi jangan pernah menaruh API key atau secret di sana. Terapkan validasi, rate limiting, sanitasi, dan proteksi spam di server. Formspree dapat digunakan sebagai alternatif.
+File PNG dan ICO adalah hasil `npm run generate:favicons` dari bentuk mark dan sengaja tidak disimpan di Git karena media review hanya mendukung file teks. Script `postinstall`, `predev`, dan `prebuild` memastikan seluruh file biner yang direferensikan tersedia sebelum aplikasi dijalankan atau dibangun.
 
-## Environment variable
+Jangan mengubah proporsi, mengganti warna sembarangan, atau menambahkan efek yang menurunkan keterbacaan. Sisakan clear space minimal setara ketebalan shield. Gunakan versi monokrom untuk latar yang tidak cocok.
 
-| Variabel | Wajib | Keterangan |
-| --- | --- | --- |
-| `VITE_CONTACT_API_URL` | Tidak | URL endpoint form produksi; kosong pada demo. |
+## Content verification notice
 
-## Catatan publikasi
+> **Sebelum publikasi:** statistik proyek/klien, sertifikasi tim, informasi kontak, dan klaim layanan harus diverifikasi serta sesuai kemampuan aktual. Terminal scan adalah demonstrasi visual, bukan pemindai keamanan.
 
-Angka statistik, daftar sertifikasi, cakupan dukungan, informasi kontak, dan klaim bisnis dalam template harus diverifikasi oleh pemilik bisnis sebelum situs dipublikasikan. Structured data sengaja tidak memuat sertifikasi, jumlah klien, atau legal entity yang belum diverifikasi.
+## Testing checklist
 
-## Dependency utama
+- [ ] Routing dan direct refresh
+- [ ] Mobile menu dan contact form
+- [ ] Keyboard navigation
+- [ ] Layout responsif tanpa overflow
+- [ ] Metadata per halaman
+- [ ] Favicon dan logo pada latar gelap/terang
+- [ ] Production build
 
-React, React DOM, React Router DOM, Vite, Tailwind CSS, Lucide React, Framer Motion, React Helmet Async, dan React Hook Form.
+## License
+
+Copyright © 2026 Xech Cyber Security. All rights reserved.
