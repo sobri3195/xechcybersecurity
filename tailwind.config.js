@@ -1,0 +1,2 @@
+/** @type {import('tailwindcss').Config} */
+export default { content: ['./index.html','./src/**/*.{js,jsx}'], theme: { extend: { colors: { ink:'#0A0A0A', panel:'#111111', card:'#121212', neon:'#F02D4F', glow:'#FF365C', copy:'#E6E6E6', muted:'#8F8F96' }, fontFamily:{sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']}, maxWidth:{site:'1200px'}, boxShadow:{glow:'0 0 30px rgba(240,45,79,.14)'} } }, plugins:[] }

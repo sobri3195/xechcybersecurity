@@ -1,0 +1,1 @@
+export default function SectionHeading({eyebrow,title,description,center=false}){return <div className={`mb-10 max-w-2xl ${center?'mx-auto text-center':''}`}><p className="eyebrow">{eyebrow}</p><h2 className="heading mt-3">{title}</h2>{description&&<p className="mt-4 text-muted">{description}</p>}</div>}
