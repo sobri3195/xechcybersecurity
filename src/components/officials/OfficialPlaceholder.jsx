@@ -1,0 +1,1 @@
+import { UserRound } from 'lucide-react'; export default function OfficialPlaceholder({alt}){return <div role="img" aria-label={alt} className="grid aspect-square place-items-center rounded-xl bg-gradient-to-br from-neon/20 to-white/5"><UserRound className="h-24 w-24 text-muted"/></div>}

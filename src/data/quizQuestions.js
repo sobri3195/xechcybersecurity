@@ -1,0 +1,13 @@
+const templates=[
+['Password dan Autentikasi','Apa perlindungan terbaik selain password unik?',['Menonaktifkan layar','Mengaktifkan autentikasi multifaktor','Membagikan password','Memakai satu password'],1,'MFA menambah lapisan verifikasi.'],
+['Phishing','Apa tindakan aman saat menerima tautan login mencurigakan?',['Klik segera','Balas dengan password','Buka situs resmi secara manual','Teruskan ke semua orang'],2,'Buka alamat resmi secara mandiri dan laporkan pesan.'],
+['Malware','Apa langkah dasar mengurangi risiko malware?',['Abaikan pembaruan','Instal dari sumber tepercaya','Matikan proteksi','Buka semua lampiran'],1,'Sumber tepercaya dan pembaruan mengurangi risiko.'],
+['Keamanan Perangkat','Apa yang dilakukan sebelum meninggalkan laptop kerja?',['Biarkan terbuka','Kunci layar','Bagikan akun','Matikan password'],1,'Kunci layar mencegah akses tanpa izin.'],
+['Keamanan Jaringan','Jaringan mana yang lebih aman untuk pekerjaan sensitif?',['Wi-Fi publik terbuka','Jaringan terkelola dan terenkripsi','Hotspot tanpa password','Jaringan tidak dikenal'],1,'Gunakan jaringan terkelola dan terenkripsi.'],
+['Keamanan Web','Apa tanda dasar koneksi web terenkripsi?',['Alamat HTTPS valid','Banyak iklan','Huruf kapital','Warna logo'],0,'HTTPS membantu melindungi data saat transit, meski bukan jaminan situs tepercaya.'],
+['Privasi Data','Apa prinsip minimisasi data?',['Kumpulkan semuanya','Simpan selamanya','Ambil hanya yang diperlukan','Bagikan bebas'],2,'Hanya data yang diperlukan yang sebaiknya dikumpulkan.'],
+['Incident Response','Apa tindakan pertama saat menduga insiden?',['Hapus semua bukti','Ikuti prosedur dan laporkan','Unggah ke media sosial','Diamkan'],1,'Pelaporan cepat melalui prosedur resmi membantu respons.'],
+['Social Engineering','Apa respons terhadap permintaan mendesak yang tidak biasa?',['Langsung patuh','Verifikasi lewat kanal terpisah','Kirim kredensial','Abaikan kebijakan'],1,'Verifikasi identitas dan permintaan lewat kanal tepercaya.'],
+['Backup dan Recovery','Apa karakteristik backup yang baik?',['Tidak pernah diuji','Satu salinan saja','Terpisah dan diuji pemulihannya','Selalu terhubung'],2,'Backup perlu terpisah dan diuji berkala.']];
+// correctAnswer adalah indeks berbasis nol (0–3). Sumber kosong sampai editor menambahkan referensi resmi.
+export const quizQuestions=Array.from({length:50},(_,i)=>{const t=templates[i%templates.length];return{id:`quiz-${String(i+1).padStart(3,'0')}`,question:`${t[1]} (Variasi ${Math.floor(i/10)+1})`,options:t[2],correctAnswer:t[3],explanation:t[4],category:t[0],difficulty:['Mudah','Sedang','Sulit'][i%3],sourceTitle:'',sourceUrl:'',active:true}});

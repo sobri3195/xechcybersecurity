@@ -1,0 +1,4 @@
+import { dateToSeed,daysBetween,seededShuffle } from './dateSeed';
+export const KEYS={state:'xech_daily_quiz_state',history:'xech_daily_quiz_history',stats:'xech_daily_quiz_stats'};
+export function selectDailyQuestions(bank,date,history=[]){const active=bank.filter(q=>q.active);const recent=new Set(history.filter(h=>daysBetween(h.date,date)>=0&&daysBetween(h.date,date)<=3).flatMap(h=>h.questionIds||[]));const fresh=active.filter(q=>!recent.has(q.id));const pool=fresh.length>=5?fresh:active;return seededShuffle(pool,dateToSeed(date)).slice(0,5)}
+export function calculateStats(history){const h=[...history].sort((a,b)=>a.date.localeCompare(b.date)).slice(-30);let current=0,best=0,last='';h.forEach(x=>{current=last&&daysBetween(last,x.date)===1?current+1:1;best=Math.max(best,current);last=x.date});return{currentStreak:current,bestStreak:best,bestScore:Math.max(0,...h.map(x=>x.score)),total:h.length,average:h.length?h.reduce((n,x)=>n+x.score,0)/h.length:0}}
