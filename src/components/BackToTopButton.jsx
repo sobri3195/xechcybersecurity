@@ -1,0 +1,2 @@
+import { useEffect,useState } from 'react'; import { ArrowUp } from 'lucide-react'
+export default function BackToTopButton(){const [show,setShow]=useState(false);useEffect(()=>{const fn=()=>setShow(scrollY>500);addEventListener('scroll',fn,{passive:true});return()=>removeEventListener('scroll',fn)},[]);return show&&<button onClick={()=>scrollTo({top:0,behavior:'smooth'})} className="fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-lg border border-neon/40 bg-panel text-neon shadow-glow" aria-label="Kembali ke atas"><ArrowUp/></button>}
