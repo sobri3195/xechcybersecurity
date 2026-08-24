@@ -1,0 +1,9 @@
+import React, { lazy, Suspense, useEffect, useState } from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import Logo from './components/Logo'
+import './styles.css'
+const Home=lazy(()=>import('./pages/Home')); const About=lazy(()=>import('./pages/About')); const Services=lazy(()=>import('./pages/Services')); const Contact=lazy(()=>import('./pages/Contact')); const NotFound=lazy(()=>import('./pages/NotFound'))
+function MetaScroll(){const {pathname}=useLocation(); useEffect(()=>{window.scrollTo(0,0); const names={'/':'Xech Cyber Security','/about':'Tentang | Xech Cyber','/services':'Layanan | Xech Cyber','/contact':'Kontak | Xech Cyber'}; document.title=names[pathname]||'Halaman Tidak Ditemukan | Xech Cyber'},[pathname]); return null}
+function App(){const [open,setOpen]=useState(false); return <><MetaScroll/><header><nav aria-label="Navigasi utama"><Logo/><button className="menu" aria-expanded={open} aria-controls="navlinks" onClick={()=>setOpen(!open)}>Menu</button><div id="navlinks" className={open?'navlinks open':'navlinks'}>{[['/','Home'],['/about','About'],['/services','Services'],['/contact','Contact']].map(([to,n])=><NavLink key={to} to={to} end={to==='/'} onClick={()=>setOpen(false)}>{n}</NavLink>)}</div></nav></header><main><Suspense fallback={<p className="loading">Memuat…</p>}><Routes><Route path="/" element={<Home/>}/><Route path="/about" element={<About/>}/><Route path="/services" element={<Services/>}/><Route path="/contact" element={<Contact/>}/><Route path="*" element={<NotFound/>}/></Routes></Suspense></main><footer><Logo/><p>© 2026 Xech Cyber Security. All rights reserved.</p></footer></>}
+ReactDOM.createRoot(document.getElementById('root')).render(<React.StrictMode><BrowserRouter><App/></BrowserRouter></React.StrictMode>)

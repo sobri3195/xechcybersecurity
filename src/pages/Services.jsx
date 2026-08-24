@@ -1,0 +1,2 @@
+import { Link } from 'react-router-dom'; import { services } from '../data/services'
+export default function Services(){return <section className="page"><p className="eyebrow">LAYANAN</p><h1>Kapabilitas untuk setiap tahap keamanan.</h1><p>Dari pemetaan risiko hingga respons insiden, ruang lingkup disesuaikan dengan konteks, aset, dan prioritas organisasi.</p><div className="cards service-list">{services.map((s,i)=><article key={s.title}><span>0{i+1}</span><h2>{s.title}</h2><p>{s.text}</p><Link to="/contact">Konsultasikan layanan →</Link></article>)}</div></section>}

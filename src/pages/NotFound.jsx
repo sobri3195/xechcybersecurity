@@ -1,0 +1,1 @@
+import { Link } from 'react-router-dom'; export default function NotFound(){return <section className="page notfound"><p className="eyebrow">ERROR 404</p><h1>Halaman tidak ditemukan.</h1><p>URL mungkin berubah atau tidak tersedia.</p><Link className="button" to="/">Kembali ke Home</Link></section>}
