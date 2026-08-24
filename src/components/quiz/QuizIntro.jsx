@@ -1,0 +1,1 @@
+import QuizHistory from './QuizHistory'; import QuizStats from './QuizStats'; export default function QuizIntro({date,stats,history,onStart}){return <div><div className="card mb-5"><p>{date} · 5 soal · sekitar 3 menit</p><button className="btn-primary mt-5" onClick={onStart}>Mulai Quiz</button></div><QuizStats stats={stats}/><QuizHistory history={history}/></div>}
