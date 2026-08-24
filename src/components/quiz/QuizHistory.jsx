@@ -1,0 +1,1 @@
+export default function QuizHistory({history}){return <section className="mt-6"><h2 className="font-bold">Riwayat tujuh hari terakhir</h2>{history.length?<ul className="mt-2 text-muted">{history.slice(-7).reverse().map(x=><li key={x.date}>{x.date}: {x.score}/5</li>)}</ul>:<p className="mt-2 text-muted">Belum ada riwayat.</p>}</section>}

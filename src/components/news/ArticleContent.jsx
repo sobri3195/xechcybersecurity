@@ -1,0 +1,1 @@
+export default function ArticleContent({sections}){return <div className="article">{sections.map((s,i)=><section id={`bagian-${i+1}`} key={s.heading}><h2>{s.heading}</h2>{s.paragraphs.map(p=><p key={p}>{p}</p>)}</section>)}</div>}

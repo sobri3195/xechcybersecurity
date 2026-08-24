@@ -1,0 +1,1 @@
+export default function QuizProgress({current,total}){return <div><p>Soal {current} dari {total}</p><div className="mt-2 h-2 rounded bg-white/10"><div className="h-full rounded bg-neon" style={{width:`${current/total*100}%`}}/></div></div>}
