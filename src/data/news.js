@@ -11,6 +11,58 @@ const article = (data) => ({
 // melewati verifikasi editorial sebelum situs dipublikasikan.
 export const news = [
   article({
+    id: 'news-007',
+    slug: 'ai-mengubah-risiko-sql-injection-2026',
+    title: 'AI dan SQL Injection di 2026: Serangan Makin Cepat, Pertahanan Harus Lebih Cerdas',
+    excerpt: 'AI mempercepat pencarian celah dan variasi payload SQL injection, tetapi tim keamanan dapat memakai teknologi yang sama untuk menemukan serta menutup risiko lebih dini.',
+    category: 'AI & Keamanan',
+    author: 'Tim Riset Keamanan Xech Cyber',
+    publishedAt: '2026-08-25',
+    updatedAt: '2026-08-25',
+    readTime: 7,
+    featured: true,
+    image: '/images/news/ai-sql-injection-2026.svg',
+    imageAlt: 'Ilustrasi kecerdasan buatan yang melindungi basis data dari SQL injection',
+    tags: ['AI', 'SQL injection', 'AppSec', 'keamanan aplikasi'],
+    sections: [
+      {
+        heading: 'SQL injection belum menjadi masalah lama',
+        paragraphs: [
+          'SQL injection terjadi ketika input yang tidak tepercaya ikut membentuk perintah basis data. Dampaknya dapat berupa akses tanpa izin, perubahan data, hingga terganggunya layanan. Pada 2026, akar masalahnya tetap sama: aplikasi mencampurkan data pengguna dengan struktur kueri tanpa pembatasan yang benar.',
+          'AI tidak menciptakan kelas kerentanan baru, tetapi dapat membantu pelaku menguji lebih banyak variasi input dan menyesuaikannya terhadap respons aplikasi dengan lebih cepat. Karena itu, organisasi tidak boleh mengandalkan pemblokiran kata kunci atau menyembunyikan pesan kesalahan sebagai perlindungan utama.',
+        ],
+      },
+      {
+        heading: 'Dua sisi penggunaan AI pada keamanan aplikasi',
+        paragraphs: [
+          'Di sisi ofensif, otomasi berbantuan AI dapat mempercepat pemetaan endpoint, pengelompokan respons, dan pembuatan variasi payload. Risiko meningkat ketika aplikasi lama, API yang tidak terdokumentasi, atau kode hasil generasi AI diterapkan tanpa peninjauan keamanan.',
+          'Di sisi defensif, AI dapat membantu memprioritaskan temuan pemindai, menandai pola kueri yang tidak biasa, dan menjelaskan aliran data berisiko kepada pengembang. Namun, hasilnya tetap perlu diverifikasi manusia karena model dapat melewatkan konteks atau menghasilkan rekomendasi yang keliru.',
+        ],
+      },
+      {
+        heading: 'Pertahanan utama tetap berada di kode',
+        paragraphs: [
+          'Gunakan parameterized query atau prepared statement agar nilai masukan tidak pernah ditafsirkan sebagai bagian dari sintaks SQL. Terapkan validasi berbasis allowlist sesuai tipe dan kebutuhan bisnis, batasi hak akses akun basis data, serta hindari menampilkan detail kesalahan internal kepada pengguna.',
+          'Lapisan tambahan seperti web application firewall dapat membantu mendeteksi pola mencurigakan, tetapi bukan pengganti perbaikan kode. Rahasia koneksi harus dikelola secara aman, aktivitas basis data perlu dicatat, dan cadangan harus diuji agar respons insiden tidak dimulai dari nol.',
+        ],
+      },
+      {
+        heading: 'Cara aman memakai AI dalam pengujian',
+        paragraphs: [
+          'Gunakan AI hanya pada sistem yang dimiliki atau telah memberikan izin tertulis, dengan ruang lingkup dan batas waktu yang jelas. Jangan mengirim kode privat, kredensial, data pelanggan, atau struktur produksi ke layanan AI publik tanpa persetujuan dan kontrol organisasi.',
+          'Gabungkan code review, pengujian SAST dan DAST, dependency scanning, serta uji penetrasi terotorisasi. Setiap saran perbaikan dari AI harus melewati review, pengujian regresi, dan verifikasi bahwa kueri benar-benar memakai parameter—bukan sekadar melakukan sanitasi string.',
+        ],
+      },
+      {
+        heading: 'Checklist prioritas untuk 2026',
+        paragraphs: [
+          'Inventarisasikan seluruh aplikasi dan API yang berkomunikasi dengan basis data, lalu prioritaskan endpoint autentikasi, pencarian, filter, dan laporan. Cari kueri dinamis, migrasikan ke prepared statement, kurangi privilege akun layanan, dan tambahkan pengujian keamanan ke pipeline CI/CD.',
+          'Kecepatan AI harus dijawab dengan fondasi AppSec yang disiplin. Organisasi yang menggabungkan desain aman, otomasi terukur, dan keputusan manusia yang dapat dipertanggungjawabkan akan lebih siap menghadapi evolusi SQL injection sepanjang 2026.',
+        ],
+      },
+    ],
+  }),
+  article({
     id: 'news-001',
     slug: 'membangun-budaya-sadar-phishing',
     title: 'Membangun Budaya Sadar Phishing di Tempat Kerja',
@@ -19,7 +71,6 @@ export const news = [
     publishedAt: '2026-08-24',
     updatedAt: '2026-08-24',
     readTime: 5,
-    featured: true,
     tags: ['phishing', 'kesadaran keamanan'],
     sections: [
       { heading: 'Mengapa kewaspadaan manusia penting', paragraphs: ['Filter teknis membantu mengurangi pesan berbahaya, tetapi keputusan terakhir sering tetap berada di tangan penerima. Program kesadaran yang baik membangun kebiasaan memeriksa konteks, alamat pengirim, tautan, dan permintaan yang terasa mendesak.', 'Simulasi sebaiknya digunakan sebagai sarana belajar, bukan untuk mempermalukan peserta. Hasilnya perlu diterjemahkan menjadi perbaikan proses yang dapat dilakukan bersama.'] },

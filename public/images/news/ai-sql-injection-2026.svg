@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">AI melindungi basis data dari SQL injection</title>
+  <desc id="desc">Ilustrasi perisai digital di antara jaringan kecerdasan buatan dan basis data.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07131f"/><stop offset="1" stop-color="#111827"/></linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#52f7c5"/><stop offset="1" stop-color="#17a883"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0v48" fill="none" stroke="#fff" stroke-opacity=".05"/></pattern>
+  </defs>
+  <rect width="1200" height="600" rx="28" fill="url(#bg)"/><rect width="1200" height="600" rx="28" fill="url(#grid)"/>
+  <g fill="none" stroke="#52f7c5" stroke-opacity=".38" stroke-width="3"><path d="M170 155l180 145-180 145M1030 155L850 300l180 145"/><circle cx="150" cy="140" r="18"/><circle cx="150" cy="460" r="18"/><circle cx="1050" cy="140" r="18"/><circle cx="1050" cy="460" r="18"/></g>
+  <g transform="translate(220 190)" fill="none" stroke="#d9fff4" stroke-width="7"><ellipse cx="90" cy="25" rx="90" ry="25"/><path d="M0 25v150c0 14 40 25 90 25s90-11 90-25V25M0 75c0 14 40 25 90 25s90-11 90-25M0 125c0 14 40 25 90 25s90-11 90-25"/></g>
+  <g transform="translate(800 190)" fill="none" stroke="#d9fff4" stroke-width="7"><rect width="180" height="200" rx="28"/><path d="M45 55h90M45 100h90M45 145h55"/><circle cx="135" cy="145" r="8" fill="#52f7c5" stroke="none"/></g>
+  <path d="M600 120c74 51 135 55 135 55v121c0 92-61 158-135 190-74-32-135-98-135-190V175s61-4 135-55Z" fill="url(#shield)"/>
+  <path d="m540 300 40 40 83-91" fill="none" stroke="#05281f" stroke-linecap="round" stroke-linejoin="round" stroke-width="25"/>
+  <text x="600" y="548" fill="#d9fff4" font-family="ui-monospace, monospace" font-size="31" font-weight="700" text-anchor="middle">AI × SQL INJECTION · 2026</text>
+</svg>
