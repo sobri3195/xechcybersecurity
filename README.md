@@ -13,6 +13,7 @@ Website company profile dan lead-generation untuk layanan keamanan siber, dibang
 ## Features
 
 - Responsive multipage interface dan React Router
+- Modul artikel defensif dengan pencarian, filter kategori, halaman detail, dan checklist mitigasi
 - Reusable service components dan accessible mobile navigation
 - Contact-form validation (simulasi frontend)
 - SEO metadata, original SVG logo system, dan complete favicon support
