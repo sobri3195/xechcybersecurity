@@ -1,14 +1,58 @@
-import {useEffect,useMemo,useState} from 'react';
-import {Link,useSearchParams} from 'react-router-dom';
-import {categories,demoChallenges} from './catalog';
-import {Difficulty,Progress,State} from '../../components/pegasus/Ui';
-import {getChallenges} from '../../services/pegasusApi';
+import {useEffect, useMemo, useState} from 'react';
+import {Link, useSearchParams} from 'react-router-dom';
+import {categories, demoChallenges} from './catalog';
+import {Difficulty, Progress, State} from '../../components/pegasus/Ui';
+import {getChallenges, startChallenge} from '../../services/pegasusApi';
 
-export default function ChallengeList(){
-  const [params,setParams]=useSearchParams(),[rows,setRows]=useState([]),[loading,setLoading]=useState(true),[demo,setDemo]=useState(false);
-  const query=params.get('q')||'',category=params.get('category')||'',difficulty=params.get('difficulty')||'',status=params.get('status')||'',sort=params.get('sort')||'progress',view=params.get('view')||'grid';
-  const update=(key,value)=>setParams(current=>{const next=new URLSearchParams(current);value?next.set(key,value):next.delete(key);return next},{replace:true});
-  useEffect(()=>{let active=true;setLoading(true);getChallenges().then(data=>{if(active){setRows(data);setDemo(false)}}).catch(()=>{if(active){setRows(demoChallenges);setDemo(true)}}).finally(()=>active&&setLoading(false));return()=>{active=false}},[]);
-  const filtered=useMemo(()=>rows.filter(x=>(!query||x.title.toLowerCase().includes(query.toLowerCase()))&&(!category||x.category_slug===category)&&(!difficulty||x.difficulty===difficulty)&&(!status||x.status===status)).sort((a,b)=>sort==='points'?Number(b.points)-Number(a.points):sort==='difficulty'?Number(a.points)-Number(b.points):Number(a.locked)-Number(b.locked)),[rows,query,category,difficulty,status,sort]);
-  return <section className="peg-wrap peg-page"><div className="peg-heading"><div><p className="peg-kicker">MISSION DIRECTORY</p><h1>Challenge</h1></div><div className="peg-view" aria-label="Mode tampilan"><button type="button" title="Tampilan grid" onClick={()=>update('view','grid')} aria-pressed={view==='grid'}>▦</button><button type="button" title="Tampilan daftar" onClick={()=>update('view','list')} aria-pressed={view==='list'}>☷</button></div></div>{demo&&<div className="peg-notice" role="status"><strong>Mode pratinjau</strong><span>API belum terhubung. Katalog aman ditampilkan tanpa flag atau solusi.</span></div>}<div className="peg-panel peg-filters"><label>Cari<input value={query} onChange={e=>update('q',e.target.value)} placeholder="Cari judul…"/></label><label>Kategori<select value={category} onChange={e=>update('category',e.target.value)}><option value="">Semua kategori</option>{categories.map(x=><option value={x[0]} key={x[0]}>{x[1]}</option>)}</select></label><label>Kesulitan<select value={difficulty} onChange={e=>update('difficulty',e.target.value)}><option value="">Semua level</option>{['easy','medium','hard','expert'].map(x=><option key={x}>{x}</option>)}</select></label><label>Status<select value={status} onChange={e=>update('status',e.target.value)}><option value="">Semua status</option><option value="not_started">Belum dimulai</option><option value="in_progress">Dikerjakan</option><option value="completed">Selesai</option></select></label><label>Urutkan<select value={sort} onChange={e=>update('sort',e.target.value)}><option value="progress">Progres</option><option value="points">Poin</option><option value="difficulty">Kesulitan</option></select></label></div>{loading?<State/>:<><Progress label="Misi ditemukan" value={filtered.length} valueLabel={`${filtered.length} / ${rows.length}`}/><div className={`peg-challenges ${view}`}>{filtered.map(x=><article className={`peg-challenge ${x.locked?'locked':''}`} key={x.id}><header><span>{x.public_id||`#${String(x.id).padStart(3,'0')}`}</span><Difficulty value={x.difficulty}/></header><div><small>{x.category}</small><h2>{x.title}</h2><p>{x.description}</p></div><footer><strong>{x.points} PTS</strong>{x.locked?<span title="Selesaikan prerequisite">◈ Terkunci</span>:<Link to={`/pegasus/challenges/${x.id}`}>{x.status==='completed'?'Tinjau Solusi':x.status==='in_progress'?'Lanjutkan':'Mulai Challenge'} →</Link>}</footer></article>)}</div>{!filtered.length&&<State type="empty" message="Tidak ada challenge yang cocok. Coba hapus satu atau beberapa filter."/>}</>}</section>
+export default function ChallengeList() {
+  const [params] = useSearchParams();
+  const [filters, setFilters] = useState({query: '', category: params.get('category') || '', difficulty: '', status: '', sort: 'progress'});
+  const [view, setView] = useState('grid');
+  const [challenges, setChallenges] = useState([]);
+  const [state, setState] = useState({loading: true, error: '', starting: null});
+
+  const load = () => {
+    setState(current => ({...current, loading: true, error: ''}));
+    getChallenges().then(setChallenges)
+      .then(() => setState(current => ({...current, loading: false})))
+      .catch(error => setState(current => ({...current, loading: false, error: error.message})));
+  };
+  useEffect(load, []);
+
+  const source = challenges.length ? challenges : (state.error ? demoChallenges : []);
+  const rows = useMemo(() => source.filter(item =>
+    (!filters.query || item.title.toLowerCase().includes(filters.query.toLowerCase())) &&
+    (!filters.category || item.category_slug === filters.category) &&
+    (!filters.difficulty || item.difficulty === filters.difficulty) &&
+    (!filters.status || item.status === filters.status)
+  ).sort((a, b) => filters.sort === 'points' ? b.points - a.points : filters.sort === 'difficulty' ? a.points - b.points : Number(a.locked) - Number(b.locked)), [source, filters]);
+
+  const update = event => setFilters(current => ({...current, [event.target.name]: event.target.value}));
+  const begin = async (event, challenge) => {
+    if (state.error || challenge.status !== 'not_started') return;
+    event.preventDefault();
+    setState(current => ({...current, starting: challenge.id}));
+    try {
+      await startChallenge(challenge.id);
+      window.location.assign(`/pegasus/challenges/${challenge.id}`);
+    } catch (error) {
+      setState(current => ({...current, starting: null, error: error.message}));
+    }
+  };
+
+  return <section className="peg-wrap peg-page">
+    <div className="peg-heading"><div><p className="peg-kicker">MISSION DIRECTORY</p><h1>Challenge</h1></div><div className="peg-view" aria-label="Mode tampilan"><button onClick={() => setView('grid')} aria-label="Tampilan kartu" aria-pressed={view === 'grid'}>▦</button><button onClick={() => setView('list')} aria-label="Tampilan daftar" aria-pressed={view === 'list'}>☷</button></div></div>
+    {state.loading && <State/>}
+    {state.error && <><State type="error" message={`${state.error} Katalog pratinjau ditampilkan; progres tidak akan disimpan.`}/><button className="peg-button ghost" onClick={load}>Hubungkan ulang API</button></>}
+    <div className="peg-panel peg-filters">
+      <label>Cari<input name="query" value={filters.query} onChange={update} placeholder="Cari judul…"/></label>
+      <label>Kategori<select name="category" value={filters.category} onChange={update}><option value="">Semua kategori</option>{categories.map(([slug, name]) => <option value={slug} key={slug}>{name}</option>)}</select></label>
+      <label>Kesulitan<select name="difficulty" value={filters.difficulty} onChange={update}><option value="">Semua level</option>{['easy', 'medium', 'hard', 'expert'].map(value => <option key={value}>{value}</option>)}</select></label>
+      <label>Status<select name="status" value={filters.status} onChange={update}><option value="">Semua status</option><option value="not_started">Belum dimulai</option><option value="in_progress">Dikerjakan</option><option value="completed">Selesai</option></select></label>
+      <label>Urutkan<select name="sort" value={filters.sort} onChange={update}><option value="progress">Progres</option><option value="points">Poin</option><option value="difficulty">Kesulitan</option></select></label>
+    </div>
+    <Progress label={`${rows.length} misi tersedia`} value={source.length ? Math.round(source.filter(item => item.status === 'completed').length / source.length * 100) : 0}/>
+    <div className={`peg-challenges ${view}`}>{rows.map(item => <article className={`peg-challenge ${item.locked ? 'locked' : ''}`} key={item.id}><header><span>{item.public_id || `#${String(item.id).padStart(3, '0')}`}</span><Difficulty value={item.difficulty}/></header><div><small>{item.category}</small><h2>{item.title}</h2><p>{item.description || item.scenario}</p></div><footer><strong>{item.points} PTS</strong>{item.locked ? <span title="Selesaikan prerequisite">◈ Terkunci</span> : <Link onClick={event => begin(event, item)} to={`/pegasus/challenges/${item.id}`}>{state.starting === item.id ? 'Memulai…' : item.status === 'in_progress' ? 'Lanjutkan' : item.status === 'completed' ? 'Lihat Pembahasan' : 'Mulai Challenge'} →</Link>}</footer></article>)}</div>
+    {!state.loading && !rows.length && <State type="empty" message="Tidak ada challenge yang cocok dengan filter."/>}
+  </section>;
 }

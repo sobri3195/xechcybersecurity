@@ -1,7 +1,35 @@
-import {useEffect,useState} from 'react';
+import {useEffect, useState} from 'react';
 import {State} from '../../components/pegasus/Ui';
 import {getLeaderboard} from '../../services/pegasusApi';
-const demoPlayers=[{name:'N0vaByte',points:12480,completed:87,first_bloods:9},{name:'CipherWing',points:11930,completed:82,first_bloods:7},{name:'RootRanger',points:10840,completed:78,first_bloods:6},{name:'PacketFox',points:9760,completed:69,first_bloods:4},{name:'ShellSage',points:9120,completed:65,first_bloods:3}];
-const tabs=[['global','Global'],['weekly','Mingguan'],['monthly','Bulanan'],['category','Per Kategori']];
-const level=points=>Math.floor(Math.sqrt(Number(points)/100))+1;
-export default function Leaderboard(){const [tab,setTab]=useState('global'),[players,setPlayers]=useState([]),[loading,setLoading]=useState(true),[demo,setDemo]=useState(false);useEffect(()=>{let active=true;setLoading(true);getLeaderboard(tab).then(data=>{if(active){setPlayers(data);setDemo(false)}}).catch(()=>{if(active){setPlayers(demoPlayers);setDemo(true)}}).finally(()=>active&&setLoading(false));return()=>{active=false}},[tab]);return <section className="peg-wrap peg-page"><p className="peg-kicker">HALL OF OPERATORS</p><h1>Leaderboard</h1><p>Skor dihitung backend dari event terverifikasi. Tampilan ini tidak pernah menentukan peringkat.</p><div className="peg-tabs" role="tablist" aria-label="Periode leaderboard">{tabs.map(([key,label])=><button role="tab" aria-selected={tab===key} aria-pressed={tab===key} onClick={()=>setTab(key)} key={key}>{label}</button>)}</div>{demo&&<div className="peg-notice"><strong>Data demonstrasi</strong><span>Masuk dan hubungkan API untuk melihat peringkat operator terkini.</span></div>}{loading?<State/>:<>{players.length>=3&&<div className="peg-podium">{players.slice(0,3).map((p,i)=><article key={p.id||p.name}><b>#{i+1}</b><div className="peg-avatar">{p.name[0]}</div><h2>{p.name}</h2><strong>{Number(p.points).toLocaleString('id-ID')} PTS</strong><small>Level {level(p.points)} · {p.completed} selesai</small></article>)}</div>}<div className="peg-table" role="table" aria-label="Peringkat operator"><div role="row" className="head"><span>RANK</span><span>OPERATOR</span><span>POIN</span><span>SELESAI</span><span>FIRST BLOOD</span><span>LEVEL</span></div>{players.map((p,i)=><div role="row" key={p.id||p.name}><b>#{i+1}</b><strong>{p.name}</strong><span>{Number(p.points).toLocaleString('id-ID')}</span><span>{p.completed}</span><span>{p.first_bloods}</span><span>{level(p.points)}</span></div>)}</div>{!players.length&&<State type="empty" message="Belum ada operator pada periode ini."/>}</>}</section>}
+
+const demoPlayers = [
+  {name: 'N0vaByte', points: 12480, completed: 87, first_bloods: 9},
+  {name: 'CipherWing', points: 11930, completed: 82, first_bloods: 7},
+  {name: 'RootRanger', points: 10840, completed: 78, first_bloods: 6},
+];
+
+export default function Leaderboard() {
+  const [players, setPlayers] = useState([]);
+  const [state, setState] = useState({loading: true, error: ''});
+
+  const load = () => {
+    setState({loading: true, error: ''});
+    getLeaderboard().then(setPlayers).then(() => setState({loading: false, error: ''}))
+      .catch(error => setState({loading: false, error: error.message}));
+  };
+  useEffect(load, []);
+
+  const rows = players.length ? players : (state.error ? demoPlayers : []);
+  return <section className="peg-wrap peg-page">
+    <p className="peg-kicker">HALL OF OPERATORS</p><h1>Leaderboard</h1>
+    <p>Skor dihitung backend dari event immutable; browser hanya menampilkan hasil.</p>
+    {state.loading && <State/>}
+    {state.error && <State type="error" message={`${state.error} Menampilkan data pratinjau.`}/>}
+    {state.error && <button className="peg-button ghost" onClick={load}>Coba lagi</button>}
+    {!state.loading && !rows.length && <State type="empty" message="Belum ada operator yang memperoleh skor."/>}
+    {!!rows.length && <>
+      <div className="peg-podium">{rows.slice(0, 3).map((player, index) => <article key={player.id || player.name}><b>#{index + 1}</b><div className="peg-avatar">{player.name[0]}</div><h2>{player.name}</h2><strong>{Number(player.points).toLocaleString('id-ID')} PTS</strong><small>{player.completed} selesai</small></article>)}</div>
+      <div className="peg-table" role="table"><div role="row" className="head"><span>RANK</span><span>OPERATOR</span><span>POIN</span><span>SELESAI</span><span>FIRST BLOOD</span><span>LEVEL</span></div>{rows.map((player, index) => <div role="row" key={player.id || player.name}><b>#{index + 1}</b><strong>{player.name}</strong><span>{Number(player.points).toLocaleString('id-ID')}</span><span>{player.completed}</span><span>{player.first_bloods}</span><span>{Math.floor(Math.sqrt(Number(player.points) / 100)) + 1}</span></div>)}</div>
+    </>}
+  </section>;
+}
