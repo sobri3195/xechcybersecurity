@@ -86,7 +86,9 @@ Semua variabel Vite berawalan `VITE_` tersedia di browser. Jangan pernah menyimp
 
 ## Contact-form integration
 
-Form v1.0 masih frontend-only: loading dan success state disimulasikan, sedangkan error validasi ditampilkan di sisi klien. Untuk integrasi, baca `VITE_CONTACT_API_URL`, kirim payload melalui HTTPS, lalu petakan respons endpoint ke loading, success, dan error state. Endpoint wajib menerapkan validasi server-side, rate limiting, dan spam protection. Jangan mengirim API secret dari frontend.
+Form kontak membaca `VITE_CONTACT_API_URL` dan mengirim JSON hanya setelah validasi klien serta persetujuan pemrosesan informasi. Form memiliki honeypot, timeout 12 detik, fokus otomatis ke input invalid, dan status loading/success/error yang dapat diumumkan pembaca layar. Jika endpoint belum dikonfigurasi, UI menyatakan kanal belum tersedia dan **tidak** menampilkan klaim pengiriman palsu.
+
+Endpoint harus menerima `POST` JSON berisi `name`, `email`, `service`, `urgency`, `message`, dan `privacyConsent`. Respons sukses dapat mengembalikan `{ "message": "..." }`; respons gagal sebaiknya mengembalikan status HTTP yang tepat beserta pesan aman. Validasi server-side, pembatasan ukuran payload, rate limiting, proteksi spam/CSRF sesuai arsitektur, sanitasi log, kebijakan retensi, dan observability tetap wajib. Jangan pernah menaruh API secret di variabel `VITE_` karena nilainya tersedia di browser.
 
 ## Deployment to Vercel
 
