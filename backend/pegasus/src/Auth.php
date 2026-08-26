@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+final class Auth { public function __construct(private PDO $db){} public function user(bool $admin=false): array { $header=$_SERVER['HTTP_AUTHORIZATION']??''; if(!preg_match('/^Bearer ([A-Za-z0-9._~-]{32,})$/',$header,$m)) Api::error('Autentikasi diperlukan',401); $q=$this->db->prepare('SELECT u.id,u.name,u.role FROM api_tokens t JOIN users u ON u.id=t.user_id WHERE t.token_hash=? AND t.expires_at>NOW() LIMIT 1');$q->execute([hash('sha256',$m[1])]);$u=$q->fetch();if(!$u)Api::error('Token tidak valid',401);if($admin&&$u['role']!=='admin')Api::error('Akses administrator diperlukan',403);return $u; } }

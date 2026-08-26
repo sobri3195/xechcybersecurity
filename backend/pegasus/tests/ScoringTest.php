@@ -1,0 +1,2 @@
+<?php
+declare(strict_types=1);require dirname(__DIR__).'/src/Scoring.php';$cases=[[100,0,false,120],[200,1,false,180],[200,2,false,150],[350,3,false,175],[500,0,true,650]];foreach($cases as [$base,$hints,$blood,$expected]){$actual=Scoring::solve($base,$hints,$blood)['total'];if($actual!==$expected){fwrite(STDERR,"Expected $expected, got $actual\n");exit(1);}}foreach([0,1,2,3] as $h)if(Scoring::solve(0,$h,false)['total']<0)exit(1);echo "Scoring tests passed\n";
