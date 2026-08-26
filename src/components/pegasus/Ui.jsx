@@ -1,4 +1,4 @@
 export function Metric({label,value,sub}){return <div className="peg-panel"><span className="peg-label">{label}</span><strong className="peg-metric">{value}</strong>{sub&&<small>{sub}</small>}</div>}
-export function Progress({value,label}){return <div><div className="peg-progress-label"><span>{label}</span><span>{value}%</span></div><div className="peg-progress"><i style={{width:`${value}%`}}/></div></div>}
+export function Progress({value,label,valueLabel}){const safe=Math.min(100,Math.max(0,Number(value)||0));return <div><div className="peg-progress-label"><span>{label}</span><span>{valueLabel??`${safe}%`}</span></div><div className="peg-progress" role="progressbar" aria-label={label} aria-valuemin="0" aria-valuemax="100" aria-valuenow={safe}><i style={{width:`${safe}%`}}/></div></div>}
 export function State({type='loading',message}){return <div className={`peg-state ${type}`} role="status">{message||'Memuat data aman…'}</div>}
 export function Difficulty({value}){return <span className={`peg-difficulty ${value}`}>{value==='expert'?'BOSS':value}</span>}
