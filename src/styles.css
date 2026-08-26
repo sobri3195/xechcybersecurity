@@ -17,3 +17,4 @@
 
 main.pegasus-main{max-width:none;padding:0}
 .peg-terminal>header{position:static;z-index:auto;background:transparent;backdrop-filter:none}
+.contact .consent{display:flex;align-items:flex-start;gap:12px;color:#c8c8cc;font-weight:500;line-height:1.5}.contact .consent input{width:20px;min-width:20px;height:20px;margin:2px 0;accent-color:var(--red)}.contact .status.error{color:#ff7790}.contact .status.loading{color:#ddd}.contact .status.success{color:#64dd95}.contact [aria-invalid=true]{border-color:#ff7790}.contact button:disabled{cursor:wait;opacity:.65}
