@@ -1,4 +1,28 @@
-export const articles = [
+const articleMetadata = {
+  'mitigasi-cve-2026-19478-gitlab': {
+    author: { name: 'Raka Pradana', role: 'Security Researcher · Xech', initials: 'RP' },
+    references: [
+      { label: 'GitLab Security Releases', url: 'https://about.gitlab.com/releases/categories/releases/', description: 'Informasi rilis dan pembaruan resmi GitLab.' },
+      { label: 'GitLab Update Guide', url: 'https://docs.gitlab.com/update/', description: 'Dokumentasi resmi untuk merencanakan jalur pembaruan.' },
+    ],
+  },
+  'mitigasi-cve-2026-73570-zimbra': {
+    author: { name: 'Nadia Kusuma', role: 'Incident Response Analyst · Xech', initials: 'NK' },
+    references: [
+      { label: 'Zimbra Security Center', url: 'https://www.zimbra.com/security/', description: 'Advisory dan informasi keamanan resmi Zimbra.' },
+      { label: 'Zimbra Documentation', url: 'https://www.zimbra.com/documentation/', description: 'Dokumentasi administrasi dan pembaruan produk.' },
+    ],
+  },
+  'mitigasi-cve-2026-63520-sharepoint': {
+    author: { name: 'Fahmi Akbar', role: 'Cloud & Infrastructure Security · Xech', initials: 'FA' },
+    references: [
+      { label: 'Microsoft Security Response Center', url: 'https://msrc.microsoft.com/update-guide/', description: 'Panduan pembaruan keamanan resmi Microsoft.' },
+      { label: 'SharePoint Updates', url: 'https://learn.microsoft.com/officeupdates/sharepoint-updates', description: 'Daftar build dan pembaruan SharePoint Server.' },
+    ],
+  },
+}
+
+const rawArticles = [
   {
     slug: 'mitigasi-cve-2026-19478-gitlab', category: 'GitLab Security', date: '24 Agustus 2026', readTime: '8 menit baca', cve: 'CVE-2026-19478', severity: 'Kritis',
     title: 'Panduan defensif merespons kerentanan GraphQL GitLab',
@@ -48,5 +72,28 @@ export const articles = [
     detection: 'Fokus pada hubungan antarperistiwa: request web yang tidak biasa, proses yang diluncurkan worker IIS, penulisan file, lalu koneksi jaringan keluar. Satu error HTTP saja bukan bukti eksploitasi; simpan timeline dan validasi dengan beberapa sumber telemetri.'
   }
 ]
+
+const heroMedia = {
+  src: '/article-security-operations.svg',
+  alt: 'Ilustrasi dashboard pusat operasi keamanan dengan panel pemantauan dan perisai',
+  caption: 'Ilustrasi: alur respons defensif dimulai dari pemantauan, mitigasi, kemudian validasi.',
+}
+
+const comparisonTable = {
+  caption: 'Prioritas tindakan berdasarkan kondisi lingkungan',
+  headers: ['Kondisi', 'Prioritas', 'Tindakan awal'],
+  rows: [
+    ['Terpapar internet', 'Segera', 'Batasi akses, pertahankan log, lalu jadwalkan pembaruan'],
+    ['Hanya jaringan internal', 'Tinggi', 'Validasi versi, petakan akses, dan uji patch'],
+    ['Sudah diperbarui', 'Monitor', 'Verifikasi build dan pantau indikator anomali'],
+  ],
+}
+
+export const articles = rawArticles.map(article => ({
+  ...article,
+  ...articleMetadata[article.slug],
+  heroMedia,
+  comparisonTable,
+}))
 
 export const getArticle = slug => articles.find(article => article.slug === slug)

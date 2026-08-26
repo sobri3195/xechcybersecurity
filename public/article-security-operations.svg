@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Ilustrasi pusat operasi keamanan</title>
+  <desc id="desc">Panel gelap menampilkan pemantauan server, alur data, dan perisai keamanan.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#17171b"/><stop offset="1" stop-color="#09090b"/></linearGradient><radialGradient id="glow"><stop stop-color="#f02d4f" stop-opacity=".32"/><stop offset="1" stop-color="#f02d4f" stop-opacity="0"/></radialGradient></defs>
+  <rect width="1200" height="620" fill="url(#bg)"/><circle cx="870" cy="270" r="300" fill="url(#glow)"/>
+  <g stroke="#ffffff" stroke-opacity=".08"><path d="M0 100h1200M0 200h1200M0 300h1200M0 400h1200M0 500h1200M100 0v620M200 0v620M300 0v620M400 0v620M500 0v620M600 0v620M700 0v620M800 0v620M900 0v620M1000 0v620M1100 0v620"/></g>
+  <g transform="translate(120 125)"><rect width="470" height="350" rx="18" fill="#101014" stroke="#fff" stroke-opacity=".16"/><circle cx="28" cy="28" r="5" fill="#f02d4f"/><circle cx="47" cy="28" r="5" fill="#fff" fill-opacity=".2"/><path d="M45 105h280M45 145h365M45 185h230M45 225h325" stroke="#fff" stroke-opacity=".16" stroke-width="14"/><path d="M45 105h185M45 145h290M45 185h145M45 225h245" stroke="#f02d4f" stroke-width="5"/></g>
+  <g transform="translate(750 128)"><path d="M150 0 285 52v112c0 103-55 177-135 216C70 341 15 267 15 164V52z" fill="#111116" stroke="#f02d4f" stroke-width="4"/><path d="m91 183 42 43 82-95" fill="none" stroke="#f02d4f" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"/></g>
+  <g fill="#e6e6e6" font-family="monospace"><text x="120" y="535" font-size="20" opacity=".55">SECURITY OPERATIONS / DEFENSIVE PLAYBOOK</text><text x="120" y="570" font-size="14" fill="#f02d4f">MONITOR • MITIGATE • VERIFY</text></g>
+</svg>
