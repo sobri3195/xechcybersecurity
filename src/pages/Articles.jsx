@@ -70,6 +70,7 @@ export default function Articles() {
               <p className="article-meta">{article.category} · {article.readTime}</p>
               <h2>{article.title}</h2>
               <p>{article.summary}</p>
+              <p className="article-card-author">Oleh <strong>{article.author.name}</strong></p>
               <div className="article-card-footer">
                 <strong>{article.cve}</strong>
                 <Link to={`/articles/${article.slug}`} aria-label={`Baca tutorial: ${article.title}`}>
