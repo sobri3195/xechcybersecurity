@@ -64,7 +64,7 @@ export default function Articles() {
           {filteredArticles.map(article => (
             <article className="article-card" key={article.slug}>
               <div className="article-card-top">
-                <span aria-hidden="true">{article.cve.split('-').at(-1).slice(-2)}</span>
+                <span aria-hidden="true">{article.cve.startsWith('CVE-') ? article.cve.split('-').at(-1).slice(-2) : 'AI'}</span>
                 <span className="severity">{article.severity}</span>
               </div>
               <p className="article-meta">{article.category} · {article.readTime}</p>

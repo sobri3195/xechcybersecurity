@@ -1,4 +1,12 @@
 const articleMetadata = {
+  'aircrack-ng-mcp-server-keamanan-wifi': {
+    author: { name: 'Muhammad Sobri Maulana', role: 'Kontributor', initials: 'MSM' },
+    references: [
+      { label: 'Dokumentasi Aircrack-ng', url: 'https://www.aircrack-ng.org/documentation.html', description: 'Dokumentasi resmi suite pengujian keamanan jaringan nirkabel Aircrack-ng.' },
+      { label: 'Model Context Protocol', url: 'https://modelcontextprotocol.io/', description: 'Dokumentasi protokol terbuka untuk menghubungkan aplikasi AI dengan sistem eksternal.' },
+      { label: 'Wi-Fi Alliance — Protected Management Frames', url: 'https://www.wi-fi.org/discover-wi-fi/security', description: 'Informasi tentang peningkatan keamanan WiFi, termasuk WPA3 dan perlindungan management frame.' },
+    ],
+  },
   'mitigasi-cve-2026-19478-gitlab': {
     author: { name: 'Raka Pradana', role: 'Security Researcher · Xech', initials: 'RP' },
     references: [
@@ -23,6 +31,58 @@ const articleMetadata = {
 }
 
 const rawArticles = [
+  {
+    slug: 'aircrack-ng-mcp-server-keamanan-wifi',
+    category: 'Wireless Security',
+    date: '26 Agustus 2026',
+    readTime: '7 menit baca',
+    cve: 'WiFi & AI',
+    severity: 'Edukasi',
+    editorial: true,
+    title: 'Aircrack-ng MCP Server: Ketika AI Bisa Membantu Menguji Keamanan WiFi',
+    summary: 'Mengenal integrasi Aircrack-ng dan AI melalui MCP, cara kerja pengujian keamanan WiFi, serta mitigasi penting untuk melindungi jaringan.',
+    intro: 'Perkembangan kecerdasan buatan (AI) tidak hanya merambah bidang produktivitas dan kreativitas, tetapi juga mulai masuk ke ranah keamanan siber. Aircrack-ng MCP Server adalah wrapper yang menghubungkan rangkaian tools Aircrack-ng dengan Claude Desktop melalui Model Context Protocol (MCP). Operator dapat memakai instruksi bahasa alami untuk membantu menjalankan alur pengujian WiFi—mulai dari penemuan perangkat dan pemindaian jaringan hingga validasi keamanan autentikasi—tanpa harus menghafal rangkaian perintah yang panjang.',
+    impact: 'Kemudahan otomasi tidak menggantikan kewajiban etis dan hukum. Seluruh pengujian harus dilakukan hanya pada jaringan milik sendiri atau jaringan yang secara eksplisit memberikan izin tertulis, dengan ruang lingkup dan periode pengujian yang jelas.',
+    before: [
+      'Gunakan Kali Linux dan adaptor USB WiFi eksternal yang mendukung mode monitor serta injeksi paket, misalnya adaptor dengan chipset Realtek RTL8814AU.',
+      'Batasi akses root dengan prinsip least privilege. Karena klien AI berjalan non-interaktif, izinkan hanya skrip MCP yang diperlukan melalui konfigurasi sudoers.',
+      'Daftarkan server pada claude_desktop_config.json dan uji skrip secara manual melalui terminal sebelum menghubungkannya ke klien AI.',
+    ],
+    sudoersExample: 'kali ALL=(ALL) NOPASSWD: /usr/bin/python3 /home/kali/aircrack-mcp/aircrackmcp.py',
+    steps: [
+      { title: 'Penemuan antarmuka dan mode monitor', body: 'Mengidentifikasi kartu jaringan nirkabel yang tersedia, kemudian mengaktifkan atau menonaktifkan mode pemantauan lalu lintas sesuai kebutuhan pengujian.' },
+      { title: 'Pemindaian jaringan', body: 'Mendeteksi SSID, BSSID, kanal, dan perangkat yang terhubung secara pasif agar operator memahami lingkungan serta memastikan target berada dalam ruang lingkup.' },
+      { title: 'Validasi autentikasi', body: 'Dalam laboratorium atau pengujian berizin, server dapat membantu merekam proses autentikasi WPA/WPA2 dan menjalankan simulasi terkontrol untuk menilai ketahanan kredensial.' },
+      { title: 'Simulasi lanjutan', body: 'Fungsi deautentikasi, pengujian kamus, dan evil twin tersedia untuk riset terkontrol. Setiap tindakan aktif berpotensi mengganggu layanan dan harus memerlukan persetujuan eksplisit.' },
+    ],
+    comparisonTable: {
+      caption: 'Kemampuan utama Aircrack-ng MCP Server',
+      headers: ['Fungsi', 'Deskripsi'],
+      rows: [
+        ['Penemuan antarmuka', 'Mengidentifikasi kartu jaringan nirkabel yang tersedia'],
+        ['Mode monitor', 'Mengaktifkan atau menonaktifkan mode pemantauan lalu lintas'],
+        ['Pemindaian jaringan', 'Mendeteksi SSID, BSSID, kanal, dan perangkat terhubung secara pasif'],
+        ['Penangkapan handshake', 'Merekam proses autentikasi WPA/WPA2 dalam pengujian berizin'],
+        ['Deautentikasi', 'Menguji perlindungan management frame melalui simulasi terkontrol'],
+        ['Pemecahan kunci', 'Menilai ketahanan kata sandi terhadap serangan kamus secara offline'],
+        ['Evil twin', 'Membuat titik akses tiruan untuk simulasi atau riset di laboratorium'],
+      ],
+    },
+    detection: 'Pada WPA2 tanpa Protected Management Frames, management frame seperti sinyal pemutusan koneksi tidak selalu diautentikasi secara kriptografis. Penyerang dapat memalsukan identitas titik akses dan mengirim frame deautentikasi. Klien biasanya mencoba tersambung kembali sehingga menghasilkan four-way handshake baru yang dapat direkam dan dianalisis secara offline. Mekanisme ini menjelaskan mengapa perlindungan management frame dan kata sandi kuat sama-sama penting.',
+    verify: [
+      'Migrasikan jaringan ke WPA3-SAE untuk mengurangi risiko serangan kamus offline terhadap handshake yang tertangkap.',
+      'Gunakan kata sandi acak berentropi tinggi dengan panjang minimal 12–16 karakter.',
+      'Aktifkan 802.11w atau Protected Management Frames untuk mengautentikasi management frame secara kriptografis.',
+      'Nonaktifkan WPS bila tidak diperlukan dan pisahkan jaringan tamu serta perangkat IoT.',
+      'Rotasi kredensial segera ketika ada indikasi handshake atau kata sandi telah terekspos.',
+    ],
+    conclusion: 'Aircrack-ng MCP Server menunjukkan bagaimana AI dapat mempercepat dan menyederhanakan pengujian keamanan yang kompleks tanpa menghilangkan visibilitas operator atas perintah yang dijalankan. Kemudahan tersebut sekaligus menegaskan pentingnya migrasi ke WPA3, aktivasi Protected Management Frames, dan pelaksanaan setiap pengujian secara etis serta berizin.',
+    heroMedia: {
+      src: '/images/articles/aircrack-ng-mcp-wifi.svg',
+      alt: 'Ilustrasi laptop AI yang terhubung ke pemantauan keamanan jaringan WiFi',
+      caption: 'AI melalui MCP dapat membantu operator menjalankan alur pengujian wireless secara lebih mudah dan tetap terkontrol.',
+    },
+  },
   {
     slug: 'mitigasi-cve-2026-19478-gitlab', category: 'GitLab Security', date: '24 Agustus 2026', readTime: '8 menit baca', cve: 'CVE-2026-19478', severity: 'Kritis',
     title: 'Panduan defensif merespons kerentanan GraphQL GitLab',
@@ -92,8 +152,8 @@ const comparisonTable = {
 export const articles = rawArticles.map(article => ({
   ...article,
   ...articleMetadata[article.slug],
-  heroMedia,
-  comparisonTable,
+  heroMedia: article.heroMedia || heroMedia,
+  comparisonTable: article.comparisonTable || comparisonTable,
 }))
 
 export const getArticle = slug => articles.find(article => article.slug === slug)
