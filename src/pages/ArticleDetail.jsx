@@ -1,5 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { getArticle } from '../data/articles'
+import SharePointAttackChain, { sharePointToc } from '../components/articles/SharePointAttackChain'
 
 function ArticleFigure({ media }) {
   if (!media) return null
@@ -68,6 +69,7 @@ export default function ArticleDetail() {
 
       <div className="article-layout">
         <div className="article-content">
+          {article.material ? <SharePointAttackChain /> : <>
           <section id="ringkasan">
             <h2>{article.editorial ? 'Apa Itu Aircrack-ng MCP Server?' : 'Apa yang perlu diketahui?'}</h2>
             <p>{article.intro}</p>
@@ -103,11 +105,11 @@ export default function ArticleDetail() {
             <p>Gunakan sumber resmi berikut untuk memvalidasi versi, prosedur, dan pembaruan terbaru sebelum melakukan perubahan.</p>
             <ul className="reference-list">{article.references.map(reference => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label}<span aria-hidden="true"> ↗</span></a><small>{reference.description}</small></li>)}</ul>
           </section>
-          <section><h2>{article.conclusion ? 'Penutup' : 'Langkah berikutnya'}</h2><p>{article.conclusion || 'Dokumentasikan perubahan, pemilik tindakan, hasil pengujian, serta risiko yang masih diterima. Jadwalkan peninjauan ulang untuk memastikan kontrol sementara telah diganti dengan perbaikan permanen.'}</p><Link className="button" to="/contact">Diskusikan kebutuhan assessment</Link></section>
+          <section><h2>{article.conclusion ? 'Penutup' : 'Langkah berikutnya'}</h2><p>{article.conclusion || 'Dokumentasikan perubahan, pemilik tindakan, hasil pengujian, serta risiko yang masih diterima. Jadwalkan peninjauan ulang untuk memastikan kontrol sementara telah diganti dengan perbaikan permanen.'}</p><Link className="button" to="/contact">Diskusikan kebutuhan assessment</Link></section></>}
         </div>
         <aside className="article-toc">
           <p>DI ARTIKEL INI</p>
-          <ol><li><a href="#ringkasan">{article.editorial ? 'Tentang Aircrack-ng MCP' : 'Apa yang perlu diketahui'}</a></li><li><a href="#persiapan">{article.editorial ? 'Persiapan dan konfigurasi' : 'Persiapan perubahan'}</a></li><li><a href="#mitigasi">{article.editorial ? 'Daftar kemampuan' : 'Tutorial mitigasi'}</a></li><li><a href="#deteksi">{article.editorial ? 'Mekanisme deautentikasi' : 'Deteksi dan triase'}</a></li><li><a href="#validasi">{article.editorial ? 'Strategi mitigasi' : 'Checklist validasi'}</a></li><li><a href="#referensi">Referensi</a></li></ol>
+          <ol>{article.material ? sharePointToc.map(([id, label]) => <li key={id}><a href={`#${id}`}>{label}</a></li>) : <><li><a href="#ringkasan">{article.editorial ? 'Tentang Aircrack-ng MCP' : 'Apa yang perlu diketahui'}</a></li><li><a href="#persiapan">{article.editorial ? 'Persiapan dan konfigurasi' : 'Persiapan perubahan'}</a></li><li><a href="#mitigasi">{article.editorial ? 'Daftar kemampuan' : 'Tutorial mitigasi'}</a></li><li><a href="#deteksi">{article.editorial ? 'Mekanisme deautentikasi' : 'Deteksi dan triase'}</a></li><li><a href="#validasi">{article.editorial ? 'Strategi mitigasi' : 'Checklist validasi'}</a></li><li><a href="#referensi">Referensi</a></li></>}</ol>
           <div><strong>Penggunaan aman</strong><p>Gunakan hanya pada sistem yang Anda miliki atau kelola dengan izin tertulis.</p></div>
         </aside>
       </div>

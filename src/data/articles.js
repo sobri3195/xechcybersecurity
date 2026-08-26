@@ -22,7 +22,7 @@ const articleMetadata = {
     ],
   },
   'mitigasi-cve-2026-63520-sharepoint': {
-    author: { name: 'Fahmi Akbar', role: 'Cloud & Infrastructure Security · Xech', initials: 'FA' },
+    author: { name: 'Muhammad Sobri Maulana', role: 'Kontributor', initials: 'MSM' },
     references: [
       { label: 'Microsoft Security Response Center', url: 'https://msrc.microsoft.com/update-guide/', description: 'Panduan pembaruan keamanan resmi Microsoft.' },
       { label: 'SharePoint Updates', url: 'https://learn.microsoft.com/officeupdates/sharepoint-updates', description: 'Daftar build dan pembaruan SharePoint Server.' },
@@ -116,9 +116,10 @@ const rawArticles = [
     detection: 'Korelasikan log Zimbra, process accounting atau EDR, firewall egress, dan perubahan file. Bila ditemukan indikasi eksekusi, jangan langsung membersihkan artefak: isolasi host dan pertahankan bukti untuk menentukan ruang lingkup kompromi.'
   },
   {
-    slug: 'mitigasi-cve-2026-63520-sharepoint', category: 'Microsoft Security', date: '24 Agustus 2026', readTime: '9 menit baca', cve: 'CVE-2026-63520', severity: 'Kritis',
-    title: 'Playbook patching dan validasi Microsoft SharePoint Server',
-    summary: 'Dari pemetaan farm hingga pengujian pascapatch: tutorial defensif menangani risiko RCE dalam rantai eksploitasi SharePoint.',
+    slug: 'mitigasi-cve-2026-63520-sharepoint', category: 'Microsoft Security', date: '26 Agustus 2026', readTime: '15 menit baca', cve: 'CVE-2026-55040 + CVE-2026-63520', severity: 'Kritis',
+    title: 'Rantai Serangan Microsoft SharePoint: CVE-2026-55040 dan CVE-2026-63520',
+    summary: 'Materi keamanan siber tentang rantai authentication bypass dan remote code execution, beserta deteksi, mitigasi, patching, dan respons insiden SharePoint Server.',
+    material: true,
     intro: 'Kerentanan improper input validation pada Microsoft SharePoint Server dilaporkan dapat memungkinkan eksekusi kode jarak jauh tanpa autentikasi dengan hak akun layanan situs. Risiko bertambah ketika celah ini dirangkai dengan kerentanan lain seperti CVE-2026-55040.',
     impact: 'Kompromi akun layanan dapat membuka akses ke konten, konfigurasi, dan sistem yang terhubung sesuai privilege akun tersebut. Detail teknis yang mulai beredar menjadi alasan untuk mempercepat patch tanpa melakukan pengujian eksploit terhadap sistem production.',
     before: ['Petakan seluruh server pada farm, peran server, build number, dan ketergantungan solusi kustom.', 'Pastikan backup farm, database konten, konfigurasi, dan kunci yang diperlukan untuk recovery tersedia.', 'Tentukan maintenance window dan siapkan pemantauan layanan, IIS, serta database.'],
