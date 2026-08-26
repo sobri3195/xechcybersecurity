@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+final class Api { static function json(mixed $data,int $status=200):never{http_response_code($status);header('Content-Type: application/json; charset=utf-8');echo json_encode(['data'=>$data],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);exit;} static function error(string $message,int $status=400):never{http_response_code($status);header('Content-Type: application/json; charset=utf-8');echo json_encode(['message'=>$message]);exit;} static function body():array{$raw=file_get_contents('php://input');try{$v=json_decode($raw?:'{}',true,32,JSON_THROW_ON_ERROR);}catch(JsonException){self::error('JSON tidak valid');}return is_array($v)?$v:[];} }
