@@ -1,4 +1,12 @@
 const articleMetadata = {
+  'certipy-celah-keamanan-ad-cs': {
+    author: { name: 'Lionel Sabdani Manik', role: 'Kontributor', initials: 'LSM' },
+    references: [
+      { label: 'Certipy — dokumentasi resmi', url: 'https://github.com/ly4k/Certipy/wiki', description: 'Panduan resmi Certipy untuk enumerasi, audit, dan pengujian AD CS.' },
+      { label: 'Microsoft — Securing PKI', url: 'https://learn.microsoft.com/windows-server/identity/ad-cs/securing-pki', description: 'Panduan Microsoft untuk mengamankan infrastruktur kunci publik berbasis AD CS.' },
+      { label: 'Microsoft — Audit Certification Services', url: 'https://learn.microsoft.com/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/audit-certification-services', description: 'Referensi audit peristiwa layanan sertifikat, termasuk penerbitan sertifikat.' },
+    ],
+  },
   'aircrack-ng-mcp-server-keamanan-wifi': {
     author: { name: 'Muhammad Sobri Maulana', role: 'Kontributor', initials: 'MSM' },
     references: [
@@ -31,6 +39,22 @@ const articleMetadata = {
 }
 
 const rawArticles = [
+  {
+    slug: 'certipy-celah-keamanan-ad-cs',
+    category: 'Active Directory Security',
+    date: '27 Agustus 2026',
+    readTime: '8 menit baca',
+    cve: 'AD CS · ESC1–ESC16',
+    severity: 'Edukasi',
+    certipyMaterial: true,
+    title: 'Certipy: Mengupas Celah Keamanan di Active Directory Certificate Services',
+    summary: 'Memahami bagaimana miskonfigurasi AD CS membuka jalur eskalasi hak akses, teknik utama Certipy, serta strategi audit, deteksi, dan mitigasinya.',
+    heroMedia: {
+      src: '/images/articles/certipy-adcs-security.svg',
+      alt: 'Ilustrasi sertifikat digital yang dilindungi perisai di dalam lingkungan Active Directory',
+      caption: 'Keamanan AD CS bergantung pada konfigurasi templat, kontrol akses, dan pemantauan penerbitan sertifikat yang disiplin.',
+    },
+  },
   {
     slug: 'aircrack-ng-mcp-server-keamanan-wifi',
     category: 'Wireless Security',
