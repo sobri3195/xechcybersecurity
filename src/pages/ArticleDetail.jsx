@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { getArticle } from '../data/articles'
 import SharePointAttackChain, { sharePointToc } from '../components/articles/SharePointAttackChain'
+import CertipyArticle, { certipyToc } from '../components/articles/CertipyArticle'
 
 function ArticleFigure({ media }) {
   if (!media) return null
@@ -69,7 +70,7 @@ export default function ArticleDetail() {
 
       <div className="article-layout">
         <div className="article-content">
-          {article.material ? <SharePointAttackChain /> : <>
+          {article.material ? <SharePointAttackChain /> : article.certipyMaterial ? <CertipyArticle references={article.references} /> : <>
           <section id="ringkasan">
             <h2>{article.editorial ? 'Apa Itu Aircrack-ng MCP Server?' : 'Apa yang perlu diketahui?'}</h2>
             <p>{article.intro}</p>
@@ -109,7 +110,7 @@ export default function ArticleDetail() {
         </div>
         <aside className="article-toc">
           <p>DI ARTIKEL INI</p>
-          <ol>{article.material ? sharePointToc.map(([id, label]) => <li key={id}><a href={`#${id}`}>{label}</a></li>) : <><li><a href="#ringkasan">{article.editorial ? 'Tentang Aircrack-ng MCP' : 'Apa yang perlu diketahui'}</a></li><li><a href="#persiapan">{article.editorial ? 'Persiapan dan konfigurasi' : 'Persiapan perubahan'}</a></li><li><a href="#mitigasi">{article.editorial ? 'Daftar kemampuan' : 'Tutorial mitigasi'}</a></li><li><a href="#deteksi">{article.editorial ? 'Mekanisme deautentikasi' : 'Deteksi dan triase'}</a></li><li><a href="#validasi">{article.editorial ? 'Strategi mitigasi' : 'Checklist validasi'}</a></li><li><a href="#referensi">Referensi</a></li></>}</ol>
+          <ol>{(article.material ? sharePointToc : article.certipyMaterial ? certipyToc : null)?.map(([id, label]) => <li key={id}><a href={`#${id}`}>{label}</a></li>) || <><li><a href="#ringkasan">{article.editorial ? 'Tentang Aircrack-ng MCP' : 'Apa yang perlu diketahui'}</a></li><li><a href="#persiapan">{article.editorial ? 'Persiapan dan konfigurasi' : 'Persiapan perubahan'}</a></li><li><a href="#mitigasi">{article.editorial ? 'Daftar kemampuan' : 'Tutorial mitigasi'}</a></li><li><a href="#deteksi">{article.editorial ? 'Mekanisme deautentikasi' : 'Deteksi dan triase'}</a></li><li><a href="#validasi">{article.editorial ? 'Strategi mitigasi' : 'Checklist validasi'}</a></li><li><a href="#referensi">Referensi</a></li></>}</ol>
           <div><strong>Penggunaan aman</strong><p>Gunakan hanya pada sistem yang Anda miliki atau kelola dengan izin tertulis.</p></div>
         </aside>
       </div>
