@@ -6,7 +6,7 @@ export const certipyToc = [
   ['teknik-lanjutan', 'Teknik yang perlu diwaspadai'],
   ['mitigasi', 'Strategi mitigasi'],
   ['relevansi', 'Red team dan blue team'],
-  ['referensi', 'Referensi'],
+  ['penutup', 'Penutup'],
 ]
 
 const modules = [
@@ -20,7 +20,7 @@ const modules = [
   ['relay', 'Menguji paparan endpoint web AD CS terhadap NTLM relay dalam engagement yang disetujui.'],
 ]
 
-export default function CertipyArticle({ references }) {
+export default function CertipyArticle() {
   return <>
     <section id="pendahuluan">
       <h2>Pendahuluan</h2>
@@ -78,14 +78,11 @@ export default function CertipyArticle({ references }) {
     <section id="relevansi">
       <h2>Relevansi bagi Red Team dan Blue Team</h2>
       <p>Bagi <strong>red team</strong>, pemahaman enumerasi templat, validasi impersonasi, shadow credentials, dan dampak kompromi CA membantu menguji kontrol secara realistis. Bagi <strong>blue team</strong>, pemahaman jalur yang sama menjadi dasar untuk merancang deteksi dan prioritas hardening yang tepat sasaran. Kolaborasi keduanya dalam pendekatan <em>purple team</em> membantu organisasi menguji apakah pencegahan, telemetri, dan prosedur respons benar-benar bekerja.</p>
-      <h2>Penutup</h2>
-      <p>AD CS sering luput dari audit rutin, padahal kepercayaan sertifikat dapat berdampak pada seluruh domain. Peninjauan templat secara berkala, kontrol akses yang ketat, perlindungan kunci CA, dan deteksi berbasis log merupakan fondasi untuk menutup jalur serangan yang dapat diidentifikasi dengan Certipy.</p>
     </section>
 
-    <section id="referensi">
-      <h2>Referensi dan Tautan Terkait</h2>
-      <p>Validasi konfigurasi dan prosedur perubahan melalui dokumentasi resmi sebelum menerapkannya pada lingkungan produksi.</p>
-      <ul className="reference-list">{references.map(reference => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label}<span aria-hidden="true"> ↗</span></a><small>{reference.description}</small></li>)}</ul>
+    <section id="penutup">
+      <h2>Penutup</h2>
+      <p>AD CS sering luput dari audit rutin, padahal kepercayaan sertifikat dapat berdampak pada seluruh domain. Peninjauan templat secara berkala, kontrol akses yang ketat, perlindungan kunci CA, dan deteksi berbasis log merupakan fondasi untuk menutup jalur serangan yang dapat diidentifikasi dengan Certipy.</p>
     </section>
   </>
 }
