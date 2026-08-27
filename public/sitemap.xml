@@ -1,1 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://your-domain.example/</loc></url><url><loc>https://your-domain.example/about</loc></url><url><loc>https://your-domain.example/services</loc></url><url><loc>https://your-domain.example/articles</loc></url><url><loc>https://your-domain.example/articles/certipy-celah-keamanan-ad-cs</loc></url><url><loc>https://your-domain.example/articles/aircrack-ng-mcp-server-keamanan-wifi</loc></url><url><loc>https://your-domain.example/articles/mitigasi-cve-2026-19478-gitlab</loc></url><url><loc>https://your-domain.example/articles/mitigasi-cve-2026-73570-zimbra</loc></url><url><loc>https://your-domain.example/articles/mitigasi-cve-2026-63520-sharepoint</loc></url><url><loc>https://your-domain.example/contact</loc></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://xech.co.id/</loc></url>
+  <url><loc>https://xech.co.id/articles</loc></url>
+  <url><loc>https://xech.co.id/journal</loc></url>
+  <url><loc>https://xech.co.id/services</loc></url>
+  <url><loc>https://xech.co.id/about</loc></url>
+  <url><loc>https://xech.co.id/contact</loc></url>
+  <url><loc>https://xech.co.id/articles/tren-ancaman-siber-2026</loc></url>
+  <url><loc>https://xech.co.id/articles/ransomware-ketahanan-pemulihan</loc></url>
+  <url><loc>https://xech.co.id/articles/phishing-social-engineering-pertahanan-berlapis</loc></url>
+  <url><loc>https://xech.co.id/articles/zero-trust-dari-prinsip-ke-kontrol</loc></url>
+  <url><loc>https://xech.co.id/articles/penetration-testing-yang-memberi-nilai</loc></url>
+  <url><loc>https://xech.co.id/articles/playbook-incident-response</loc></url>
+  <url><loc>https://xech.co.id/articles/keamanan-cloud-guardrail-yang-efektif</loc></url>
+  <url><loc>https://xech.co.id/articles/keamanan-api-dari-inventaris-ke-monitoring</loc></url>
+  <url><loc>https://xech.co.id/articles/vulnerability-management-berbasis-risiko</loc></url>
+</urlset>
