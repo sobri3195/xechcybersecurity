@@ -1,184 +1,27 @@
-const articleMetadata = {
-  'certipy-celah-keamanan-ad-cs': {
-    author: { name: 'Lionel Sabdani Manik', role: 'Kontributor', initials: 'LSM' },
-    references: [
-      { label: 'Certipy — dokumentasi resmi', url: 'https://github.com/ly4k/Certipy/wiki', description: 'Panduan resmi Certipy untuk enumerasi, audit, dan pengujian AD CS.' },
-      { label: 'Microsoft — Securing PKI', url: 'https://learn.microsoft.com/windows-server/identity/ad-cs/securing-pki', description: 'Panduan Microsoft untuk mengamankan infrastruktur kunci publik berbasis AD CS.' },
-      { label: 'Microsoft — Audit Certification Services', url: 'https://learn.microsoft.com/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/audit-certification-services', description: 'Referensi audit peristiwa layanan sertifikat, termasuk penerbitan sertifikat.' },
-    ],
-  },
-  'aircrack-ng-mcp-server-keamanan-wifi': {
-    author: { name: 'Muhammad Sobri Maulana', role: 'Kontributor', initials: 'MSM' },
-    references: [
-      { label: 'Dokumentasi Aircrack-ng', url: 'https://www.aircrack-ng.org/documentation.html', description: 'Dokumentasi resmi suite pengujian keamanan jaringan nirkabel Aircrack-ng.' },
-      { label: 'Model Context Protocol', url: 'https://modelcontextprotocol.io/', description: 'Dokumentasi protokol terbuka untuk menghubungkan aplikasi AI dengan sistem eksternal.' },
-      { label: 'Wi-Fi Alliance — Protected Management Frames', url: 'https://www.wi-fi.org/discover-wi-fi/security', description: 'Informasi tentang peningkatan keamanan WiFi, termasuk WPA3 dan perlindungan management frame.' },
-    ],
-  },
-  'mitigasi-cve-2026-19478-gitlab': {
-    author: { name: 'Raka Pradana', role: 'Security Researcher · Xech', initials: 'RP' },
-    references: [
-      { label: 'GitLab Security Releases', url: 'https://about.gitlab.com/releases/categories/releases/', description: 'Informasi rilis dan pembaruan resmi GitLab.' },
-      { label: 'GitLab Update Guide', url: 'https://docs.gitlab.com/update/', description: 'Dokumentasi resmi untuk merencanakan jalur pembaruan.' },
-    ],
-  },
-  'mitigasi-cve-2026-73570-zimbra': {
-    author: { name: 'Nadia Kusuma', role: 'Incident Response Analyst · Xech', initials: 'NK' },
-    references: [
-      { label: 'Zimbra Security Center', url: 'https://www.zimbra.com/security/', description: 'Advisory dan informasi keamanan resmi Zimbra.' },
-      { label: 'Zimbra Documentation', url: 'https://www.zimbra.com/documentation/', description: 'Dokumentasi administrasi dan pembaruan produk.' },
-    ],
-  },
-  'mitigasi-cve-2026-63520-sharepoint': {
-    author: { name: 'Muhammad Sobri Maulana', role: 'Kontributor', initials: 'MSM' },
-    references: [
-      { label: 'Microsoft Security Response Center', url: 'https://msrc.microsoft.com/update-guide/', description: 'Panduan pembaruan keamanan resmi Microsoft.' },
-      { label: 'SharePoint Updates', url: 'https://learn.microsoft.com/officeupdates/sharepoint-updates', description: 'Daftar build dan pembaruan SharePoint Server.' },
-    ],
-  },
-}
+const cover = (tone, label) => ({
+  src: `/images/articles/${tone}.svg`,
+  alt: `Visual abstrak ${label} dalam gaya grid keamanan Xech`,
+})
 
-const rawArticles = [
-  {
-    slug: 'certipy-celah-keamanan-ad-cs',
-    category: 'Active Directory Security',
-    date: '27 Agustus 2026',
-    readTime: '8 menit baca',
-    cve: 'AD CS · ESC1–ESC16',
-    severity: 'Edukasi',
-    certipyMaterial: true,
-    title: 'Certipy: Mengupas Celah Keamanan di Active Directory Certificate Services',
-    summary: 'Memahami bagaimana miskonfigurasi AD CS membuka jalur eskalasi hak akses, teknik utama Certipy, serta strategi audit, deteksi, dan mitigasinya.',
-    heroMedia: {
-      src: '/images/articles/certipy-adcs-security.svg',
-      alt: 'Ilustrasi sertifikat digital yang dilindungi perisai di dalam lingkungan Active Directory',
-      caption: 'Keamanan AD CS bergantung pada konfigurasi templat, kontrol akses, dan pemantauan penerbitan sertifikat yang disiplin.',
-    },
-  },
-  {
-    slug: 'aircrack-ng-mcp-server-keamanan-wifi',
-    category: 'Wireless Security',
-    date: '26 Agustus 2026',
-    readTime: '7 menit baca',
-    cve: 'WiFi & AI',
-    severity: 'Edukasi',
-    editorial: true,
-    title: 'Aircrack-ng MCP Server: Ketika AI Bisa Membantu Menguji Keamanan WiFi',
-    summary: 'Mengenal integrasi Aircrack-ng dan AI melalui MCP, cara kerja pengujian keamanan WiFi, serta mitigasi penting untuk melindungi jaringan.',
-    intro: 'Perkembangan kecerdasan buatan (AI) tidak hanya merambah bidang produktivitas dan kreativitas, tetapi juga mulai masuk ke ranah keamanan siber. Aircrack-ng MCP Server adalah wrapper yang menghubungkan rangkaian tools Aircrack-ng dengan Claude Desktop melalui Model Context Protocol (MCP). Operator dapat memakai instruksi bahasa alami untuk membantu menjalankan alur pengujian WiFi—mulai dari penemuan perangkat dan pemindaian jaringan hingga validasi keamanan autentikasi—tanpa harus menghafal rangkaian perintah yang panjang.',
-    impact: 'Kemudahan otomasi tidak menggantikan kewajiban etis dan hukum. Seluruh pengujian harus dilakukan hanya pada jaringan milik sendiri atau jaringan yang secara eksplisit memberikan izin tertulis, dengan ruang lingkup dan periode pengujian yang jelas.',
-    before: [
-      'Gunakan Kali Linux dan adaptor USB WiFi eksternal yang mendukung mode monitor serta injeksi paket, misalnya adaptor dengan chipset Realtek RTL8814AU.',
-      'Batasi akses root dengan prinsip least privilege. Karena klien AI berjalan non-interaktif, izinkan hanya skrip MCP yang diperlukan melalui konfigurasi sudoers.',
-      'Daftarkan server pada claude_desktop_config.json dan uji skrip secara manual melalui terminal sebelum menghubungkannya ke klien AI.',
-    ],
-    sudoersExample: 'kali ALL=(ALL) NOPASSWD: /usr/bin/python3 /home/kali/aircrack-mcp/aircrackmcp.py',
-    steps: [
-      { title: 'Penemuan antarmuka dan mode monitor', body: 'Mengidentifikasi kartu jaringan nirkabel yang tersedia, kemudian mengaktifkan atau menonaktifkan mode pemantauan lalu lintas sesuai kebutuhan pengujian.' },
-      { title: 'Pemindaian jaringan', body: 'Mendeteksi SSID, BSSID, kanal, dan perangkat yang terhubung secara pasif agar operator memahami lingkungan serta memastikan target berada dalam ruang lingkup.' },
-      { title: 'Validasi autentikasi', body: 'Dalam laboratorium atau pengujian berizin, server dapat membantu merekam proses autentikasi WPA/WPA2 dan menjalankan simulasi terkontrol untuk menilai ketahanan kredensial.' },
-      { title: 'Simulasi lanjutan', body: 'Fungsi deautentikasi, pengujian kamus, dan evil twin tersedia untuk riset terkontrol. Setiap tindakan aktif berpotensi mengganggu layanan dan harus memerlukan persetujuan eksplisit.' },
-    ],
-    comparisonTable: {
-      caption: 'Kemampuan utama Aircrack-ng MCP Server',
-      headers: ['Fungsi', 'Deskripsi'],
-      rows: [
-        ['Penemuan antarmuka', 'Mengidentifikasi kartu jaringan nirkabel yang tersedia'],
-        ['Mode monitor', 'Mengaktifkan atau menonaktifkan mode pemantauan lalu lintas'],
-        ['Pemindaian jaringan', 'Mendeteksi SSID, BSSID, kanal, dan perangkat terhubung secara pasif'],
-        ['Penangkapan handshake', 'Merekam proses autentikasi WPA/WPA2 dalam pengujian berizin'],
-        ['Deautentikasi', 'Menguji perlindungan management frame melalui simulasi terkontrol'],
-        ['Pemecahan kunci', 'Menilai ketahanan kata sandi terhadap serangan kamus secara offline'],
-        ['Evil twin', 'Membuat titik akses tiruan untuk simulasi atau riset di laboratorium'],
-      ],
-    },
-    detection: 'Pada WPA2 tanpa Protected Management Frames, management frame seperti sinyal pemutusan koneksi tidak selalu diautentikasi secara kriptografis. Penyerang dapat memalsukan identitas titik akses dan mengirim frame deautentikasi. Klien biasanya mencoba tersambung kembali sehingga menghasilkan four-way handshake baru yang dapat direkam dan dianalisis secara offline. Mekanisme ini menjelaskan mengapa perlindungan management frame dan kata sandi kuat sama-sama penting.',
-    verify: [
-      'Migrasikan jaringan ke WPA3-SAE untuk mengurangi risiko serangan kamus offline terhadap handshake yang tertangkap.',
-      'Gunakan kata sandi acak berentropi tinggi dengan panjang minimal 12–16 karakter.',
-      'Aktifkan 802.11w atau Protected Management Frames untuk mengautentikasi management frame secara kriptografis.',
-      'Nonaktifkan WPS bila tidak diperlukan dan pisahkan jaringan tamu serta perangkat IoT.',
-      'Rotasi kredensial segera ketika ada indikasi handshake atau kata sandi telah terekspos.',
-    ],
-    conclusion: 'Aircrack-ng MCP Server menunjukkan bagaimana AI dapat mempercepat dan menyederhanakan pengujian keamanan yang kompleks tanpa menghilangkan visibilitas operator atas perintah yang dijalankan. Kemudahan tersebut sekaligus menegaskan pentingnya migrasi ke WPA3, aktivasi Protected Management Frames, dan pelaksanaan setiap pengujian secara etis serta berizin.',
-    heroMedia: {
-      src: '/images/articles/aircrack-ng-mcp-wifi.svg',
-      alt: 'Ilustrasi laptop AI yang terhubung ke pemantauan keamanan jaringan WiFi',
-      caption: 'AI melalui MCP dapat membantu operator menjalankan alur pengujian wireless secara lebih mudah dan tetap terkontrol.',
-    },
-  },
-  {
-    slug: 'mitigasi-cve-2026-19478-gitlab', category: 'GitLab Security', date: '24 Agustus 2026', readTime: '8 menit baca', cve: 'CVE-2026-19478', severity: 'Kritis',
-    title: 'Panduan defensif merespons kerentanan GraphQL GitLab',
-    summary: 'Langkah terstruktur untuk memetakan paparan, memperbarui GitLab self-managed, memeriksa indikator anomali, dan memvalidasi pemulihan.',
-    intro: 'Kerentanan injeksi kode pada fitur GraphQL dilaporkan berdampak pada GitLab Community Edition dan Enterprise Edition yang dikelola sendiri. Karena serangan dapat menyasar proyek publik tanpa autentikasi pada kondisi tertentu, tim perlu memperlakukan server yang terpapar internet sebagai prioritas pemeriksaan.',
-    impact: 'Penyerang berpotensi memodifikasi atau menghapus data proyek publik. Ketersediaan proof of concept dan laporan eksploitasi aktif meningkatkan urgensi, tetapi pemeriksaan internal tetap diperlukan untuk memastikan apakah lingkungan Anda benar-benar terdampak.',
-    before: ['Catat versi GitLab, metode instalasi (Omnibus, Helm, atau paket), URL publik, serta pemilik sistem.', 'Buat snapshot atau backup sesuai prosedur resmi dan pastikan tersedia ruang penyimpanan yang cukup.', 'Ekspor daftar integrasi dan runner penting agar perubahan setelah pembaruan mudah dibandingkan.'],
-    steps: [
-      { title: 'Inventarisasi dan batasi paparan', body: 'Identifikasi seluruh instance self-managed, termasuk staging. Sambil menunggu patch window, batasi akses ke endpoint dari jaringan tepercaya melalui reverse proxy atau WAF tanpa mengganggu operasi penting.' },
-      { title: 'Perbarui melalui jalur resmi', body: 'Gunakan rilis keamanan out-of-band terbaru dari GitLab yang sesuai dengan jalur upgrade versi Anda. Baca catatan upgrade, uji di staging, lalu jalankan backup dan pembaruan pada production dalam change window.' },
-      { title: 'Tinjau jejak aktivitas', body: 'Periksa access log, audit event, aktivitas GraphQL yang tidak lazim, perubahan branch/proyek, penghapusan data, token baru, serta perubahan hak akses sejak waktu paparan yang paling awal.' },
-      { title: 'Pulihkan dan rotasi kredensial', body: 'Jika ditemukan aktivitas mencurigakan, isolasi instance, simpan bukti log, pulihkan data dari backup bersih, dan rotasi token akses, deploy key, runner token, secret integrasi, serta kredensial administrator.' }
-    ],
-    verify: ['Versi yang berjalan tercantum sebagai versi yang telah diperbaiki.', 'Health check, clone/push, pipeline, dan integrasi utama kembali normal.', 'Tidak ada perubahan proyek atau identitas yang tidak dapat dijelaskan.', 'Monitoring khusus endpoint GraphQL dan audit event sudah aktif.'],
-    detection: 'Buat baseline volume permintaan GraphQL, lalu prioritaskan lonjakan dari sumber baru, respons error berulang, dan aktivitas perubahan proyek yang tidak sesuai jadwal. Jangan hanya mengandalkan satu indikator; korelasikan access log, audit event, dan histori repository.'
-  },
-  {
-    slug: 'mitigasi-cve-2026-73570-zimbra', category: 'Email Security', date: '24 Agustus 2026', readTime: '7 menit baca', cve: 'CVE-2026-73570', severity: 'Kritis',
-    title: 'Tutorial hardening Zimbra dan penanganan risiko zimbra-snmp',
-    summary: 'Panduan aman untuk mengecek paket zimbra-snmp, mengurangi permukaan serangan, memperbarui ZCS, dan menelusuri tanda eksekusi perintah.',
-    intro: 'Celah OS command injection dilaporkan berada pada paket opsional zimbra-snmp di Zimbra Collaboration sebelum versi 10.1.20, terutama ketika notifikasi SNMP diaktifkan. Dampaknya dapat berupa eksekusi kode jarak jauh tanpa autentikasi.',
-    impact: 'Server email menyimpan data bernilai tinggi dan sering terpapar internet. Laporan eksploitasi aktif serta pencantuman dalam katalog kerentanan yang diketahui dieksploitasi membuat pembaruan dan threat hunting perlu diprioritaskan.',
-    before: ['Konfirmasi versi ZCS dan apakah zimbra-snmp benar-benar terpasang serta digunakan.', 'Dokumentasikan konfigurasi notifikasi SNMP dan tujuan penerimanya.', 'Siapkan backup mailbox, LDAP, konfigurasi, dan prosedur rollback yang sudah diuji.'],
-    steps: [
-      { title: 'Periksa kebutuhan paket', body: 'Validasi bersama tim monitoring. Jika zimbra-snmp tidak dibutuhkan, nonaktifkan atau hapus paket menggunakan prosedur vendor. Jangan menghapus komponen production tanpa backup dan persetujuan perubahan.' },
-      { title: 'Kurangi akses jaringan', body: 'Batasi port dan antarmuka manajemen ke subnet monitoring yang sah. Gunakan firewall host dan perimeter untuk menolak koneksi yang tidak diperlukan serta catat seluruh penolakan untuk investigasi.' },
-      { title: 'Naikkan versi ke 10.1.20 atau lebih baru', body: 'Ambil paket hanya dari kanal resmi Zimbra, verifikasi integritasnya, baca dependency dan known issue, uji pada replika, kemudian lakukan pembaruan sesuai runbook organisasi.' },
-      { title: 'Lakukan threat hunting', body: 'Cari proses anak yang tidak biasa dari layanan Zimbra, koneksi keluar baru, perubahan scheduled task, akun admin baru, file yang berubah di direktori aplikasi, dan autentikasi anomali.' }
-    ],
-    verify: ['ZCS menunjukkan versi 10.1.20 atau versi perbaikan yang lebih baru.', 'zimbra-snmp hanya aktif bila ada kebutuhan bisnis yang terdokumentasi.', 'Aturan firewall membatasi jalur manajemen dan monitoring.', 'Uji kirim-terima email, antrean, LDAP, dan monitoring selesai tanpa error.'],
-    detection: 'Korelasikan log Zimbra, process accounting atau EDR, firewall egress, dan perubahan file. Bila ditemukan indikasi eksekusi, jangan langsung membersihkan artefak: isolasi host dan pertahankan bukti untuk menentukan ruang lingkup kompromi.'
-  },
-  {
-    slug: 'mitigasi-cve-2026-63520-sharepoint', category: 'Microsoft Security', date: '26 Agustus 2026', readTime: '15 menit baca', cve: 'CVE-2026-55040 + CVE-2026-63520', severity: 'Kritis',
-    title: 'Rantai Serangan Microsoft SharePoint: CVE-2026-55040 dan CVE-2026-63520',
-    summary: 'Materi keamanan siber tentang rantai authentication bypass dan remote code execution, beserta deteksi, mitigasi, patching, dan respons insiden SharePoint Server.',
-    material: true,
-    intro: 'Kerentanan improper input validation pada Microsoft SharePoint Server dilaporkan dapat memungkinkan eksekusi kode jarak jauh tanpa autentikasi dengan hak akun layanan situs. Risiko bertambah ketika celah ini dirangkai dengan kerentanan lain seperti CVE-2026-55040.',
-    impact: 'Kompromi akun layanan dapat membuka akses ke konten, konfigurasi, dan sistem yang terhubung sesuai privilege akun tersebut. Detail teknis yang mulai beredar menjadi alasan untuk mempercepat patch tanpa melakukan pengujian eksploit terhadap sistem production.',
-    before: ['Petakan seluruh server pada farm, peran server, build number, dan ketergantungan solusi kustom.', 'Pastikan backup farm, database konten, konfigurasi, dan kunci yang diperlukan untuk recovery tersedia.', 'Tentukan maintenance window dan siapkan pemantauan layanan, IIS, serta database.'],
-    steps: [
-      { title: 'Kurangi permukaan akses', body: 'Batasi SharePoint on-premises ke VPN, reverse proxy, atau sumber tepercaya. Tinjau kembali publikasi endpoint dan hapus aturan firewall lama yang tidak lagi dibutuhkan.' },
-      { title: 'Terapkan pembaruan di seluruh farm', body: 'Unduh pembaruan keamanan Agustus 2026 dari Microsoft Update Catalog atau kanal resmi organisasi. Ikuti urutan pembaruan farm, selesaikan konfigurasi produk bila disyaratkan, dan jangan meninggalkan node pada build berbeda.' },
-      { title: 'Audit akun layanan', body: 'Pastikan akun aplikasi dan farm tidak memiliki hak administrator domain atau akses sistem yang tidak diperlukan. Rotasi kredensial bila terdapat indikasi kompromi dan perbarui dependensi secara terkendali.' },
-      { title: 'Periksa indikator anomali', body: 'Tinjau log IIS, ULS, Windows Event, EDR, perubahan file aplikasi, proses anak dari worker process, web shell, dan koneksi keluar yang tidak sesuai baseline.' }
-    ],
-    verify: ['Build number pada setiap node sesuai pembaruan keamanan terbaru.', 'Central Administration, site collection, search, dan integrasi bisnis lulus smoke test.', 'Tidak ada node farm tertinggal atau menunggu konfigurasi.', 'Akun layanan mengikuti least privilege dan alert EDR aktif.'],
-    detection: 'Fokus pada hubungan antarperistiwa: request web yang tidak biasa, proses yang diluncurkan worker IIS, penulisan file, lalu koneksi jaringan keluar. Satu error HTTP saja bukan bukti eksploitasi; simpan timeline dan validasi dengan beberapa sumber telemetri.'
-  }
-]
-
-const heroMedia = {
-  src: '/article-security-operations.svg',
-  alt: 'Ilustrasi dashboard pusat operasi keamanan dengan panel pemantauan dan perisai',
-  caption: 'Ilustrasi: alur respons defensif dimulai dari pemantauan, mitigasi, kemudian validasi.',
-}
-
-const comparisonTable = {
-  caption: 'Prioritas tindakan berdasarkan kondisi lingkungan',
-  headers: ['Kondisi', 'Prioritas', 'Tindakan awal'],
-  rows: [
-    ['Terpapar internet', 'Segera', 'Batasi akses, pertahankan log, lalu jadwalkan pembaruan'],
-    ['Hanya jaringan internal', 'Tinggi', 'Validasi versi, petakan akses, dan uji patch'],
-    ['Sudah diperbarui', 'Monitor', 'Verifikasi build dan pantau indikator anomali'],
-  ],
-}
-
-export const articles = rawArticles.map(article => ({
+const makeArticle = (article) => ({
   ...article,
-  ...articleMetadata[article.slug],
-  heroMedia: article.heroMedia || heroMedia,
-  comparisonTable: article.comparisonTable || comparisonTable,
-}))
+  author: { name: 'Tim Intelijen Xech', role: 'Security Research & Advisory', initials: 'XI' },
+  cover: cover(article.cover, article.category),
+  seo: { title: `${article.title} | Xech Intelligence`, description: article.summary },
+})
 
+export const articles = [
+  makeArticle({ slug:'tren-ancaman-siber-2026', title:'Membaca Tren Ancaman Siber Tanpa Terjebak Hype', summary:'Kerangka praktis untuk memilah sinyal ancaman, memetakan paparan, dan mengubah intelijen menjadi prioritas pertahanan.', category:'Threat Intelligence', publishedAt:'2026-08-27', readTime:8, cover:'threat-intelligence', tags:['threat intelligence','risk','security operations'], featured:true, related:['playbook-incident-response','vulnerability-management-berbasis-risiko'], sections:[['Dari berita menjadi konteks','Daftar ancaman yang panjang tidak otomatis menjadi intelijen. Tim perlu menghubungkan teknik penyerang dengan aset, identitas, pemasok, dan jalur akses yang benar-benar dimiliki organisasi. Mulailah dari inventaris layanan kritis, lalu tandai titik yang dapat dijangkau dari internet dan perubahan arsitektur terbaru.'],['Tiga pertanyaan penyaring','Tanyakan apakah ancaman relevan dengan teknologi yang digunakan, apakah kontrol saat ini mampu mendeteksi atau menahannya, dan apa konsekuensi bisnis jika kontrol gagal. Jawaban ini lebih berguna daripada skor popularitas sebuah isu.'],['Ritme kerja yang dapat dipertahankan','Lakukan tinjauan singkat mingguan untuk sinyal baru dan tinjauan bulanan untuk perubahan prioritas. Catat sumber, tingkat keyakinan, pemilik tindakan, serta tanggal evaluasi ulang agar asumsi tidak berubah menjadi fakta permanen.'],['Langkah praktis','Bangun daftar pantau yang kecil, hubungkan tiap sinyal ke satu hipotesis deteksi, dan uji melalui simulasi aman. Jangan menyalin indikator publik tanpa validasi karena indikator cepat kedaluwarsa dan dapat menimbulkan noise.']] }),
+  makeArticle({ slug:'ransomware-ketahanan-pemulihan', title:'Ransomware: Merancang Ketahanan Sebelum Krisis', summary:'Panduan membatasi blast radius, melindungi cadangan, dan melatih pemulihan agar keputusan tidak dibuat saat tekanan memuncak.', category:'Incident Response', publishedAt:'2026-08-24', readTime:10, cover:'ransomware-resilience', tags:['ransomware','backup','resilience'], related:['playbook-incident-response','zero-trust-dari-prinsip-ke-kontrol'], sections:[['Ransomware adalah masalah operasi','Dampak terbesar sering muncul dari terhentinya proses bisnis, bukan hanya enkripsi. Petakan layanan minimum yang harus tetap berjalan dan dependensi identitas, jaringan, data, serta vendor yang menopangnya.'],['Batasi pergerakan','Pisahkan akun administratif, kurangi hak lokal, segmentasikan layanan penting, dan pantau penggunaan kredensial yang tidak lazim. Kontrol ini mengurangi ruang gerak tanpa bergantung pada satu produk keamanan.'],['Cadangan yang benar-benar dapat dipulihkan','Simpan salinan terisolasi atau immutable sesuai kemampuan platform. Enkripsi, batasi akses, pantau penghapusan massal, dan lakukan uji pemulihan terjadwal dengan target waktu yang disepakati bisnis.'],['Latihan keputusan','Tabletop exercise harus menguji siapa yang berwenang mengisolasi sistem, bagaimana komunikasi dilakukan, bukti apa yang dipertahankan, dan kapan layanan dinyatakan aman. Dokumentasikan gap sebagai pekerjaan dengan pemilik dan tenggat.']] }),
+  makeArticle({ slug:'phishing-social-engineering-pertahanan-berlapis', title:'Phishing dan Social Engineering: Pertahanan Berlapis', summary:'Menggabungkan desain proses, kontrol identitas, pelaporan yang mudah, dan pembelajaran tanpa menyalahkan pengguna.', category:'Human Security', publishedAt:'2026-08-20', readTime:7, cover:'phishing-defense', tags:['phishing','social engineering','identity'], related:['zero-trust-dari-prinsip-ke-kontrol','keamanan-api-dari-inventaris-ke-monitoring'], sections:[['Mengapa pelatihan saja tidak cukup','Pesan yang meyakinkan dapat tiba melalui email, telepon, chat, atau alur persetujuan vendor. Pertahanan perlu mengasumsikan seseorang dapat tertipu dan memastikan satu tindakan tidak langsung memberi akses luas.'],['Perkuat jalur bernilai tinggi','Gunakan autentikasi tahan phishing bila tersedia, verifikasi di kanal kedua untuk perubahan pembayaran, dan larang persetujuan sensitif hanya berdasarkan pesan masuk. Buat proses pengecualian yang tercatat.'],['Pelaporan tanpa friksi','Sediakan satu tindakan untuk melaporkan pesan dan beri umpan balik singkat. Jangan menghukum pelapor; kecepatan laporan membantu tim menghapus pesan serupa dan meninjau sesi akun yang mungkin terdampak.'],['Ukur perbaikan sistem','Selain rasio klik simulasi, ukur waktu pelaporan, cakupan autentikasi kuat, jumlah proses pembayaran dengan verifikasi independen, dan waktu pencabutan sesi. Indikator ini lebih dekat dengan pengurangan risiko.']] }),
+  makeArticle({ slug:'zero-trust-dari-prinsip-ke-kontrol', title:'Zero Trust: Dari Prinsip ke Kontrol yang Terukur', summary:'Cara menerjemahkan verifikasi eksplisit dan least privilege menjadi roadmap identitas, perangkat, jaringan, aplikasi, dan data.', category:'Security Architecture', publishedAt:'2026-08-15', readTime:9, cover:'zero-trust', tags:['zero trust','identity','architecture'], related:['keamanan-cloud-guardrail-yang-efektif','phishing-social-engineering-pertahanan-berlapis'], sections:[['Mulai dari alur akses','Zero trust bukan satu produk. Pilih satu alur bernilai tinggi, petakan pengguna, perangkat, aplikasi, data, serta keputusan kebijakan yang terjadi dari awal sampai akhir.'],['Verifikasi dengan konteks','Nilai identitas, kesehatan perangkat, sensitivitas sumber daya, lokasi, dan anomali sesi. Kebijakan perlu memiliki jalur pemulihan agar kontrol tidak mendorong pengguna mencari jalan pintas.'],['Kurangi hak secara bertahap','Hapus akun tidak aktif, pisahkan tugas administratif, gunakan akses sementara, dan tinjau entitlement berdasarkan kebutuhan nyata. Uji dampaknya sebelum menerapkan penolakan luas.'],['Buktikan hasil','Ukur cakupan sumber daya, waktu pencabutan akses, jumlah hak permanen, dan keberhasilan skenario kehilangan perangkat atau kompromi sesi. Roadmap yang baik menunjukkan risiko mana yang berkurang.']] }),
+  makeArticle({ slug:'penetration-testing-yang-memberi-nilai', title:'Penetration Testing yang Memberi Nilai Bisnis', summary:'Menetapkan ruang lingkup, aturan pengujian, bukti, dan retest agar pentest menghasilkan perbaikan, bukan sekadar daftar temuan.', category:'Offensive Security', publishedAt:'2026-08-10', readTime:8, cover:'penetration-testing', tags:['penetration testing','assessment','remediation'], related:['vulnerability-management-berbasis-risiko','keamanan-api-dari-inventaris-ke-monitoring'], sections:[['Definisikan tujuan','Tentukan apakah pengujian ingin memvalidasi paparan eksternal, jalur menuju data tertentu, ketahanan aplikasi, atau kemampuan deteksi. Tujuan menentukan metode dan bukti yang aman untuk dikumpulkan.'],['Aturan main yang jelas','Dokumentasikan sistem di dalam dan di luar lingkup, jadwal, kontak darurat, teknik terlarang, penanganan data, serta kondisi penghentian. Pengujian hanya dilakukan dengan izin tertulis.'],['Temuan yang dapat ditindaklanjuti','Temuan harus menjelaskan prasyarat, dampak dalam konteks bisnis, bukti minimal, akar masalah, dan opsi perbaikan. Hindari klaim dampak maksimal yang tidak pernah divalidasi.'],['Retest dan pembelajaran','Uji kembali perubahan dan periksa apakah perbaikan berlaku pada pola serupa. Gunakan hasil untuk memperbaiki standar engineering, monitoring, dan proses review, bukan hanya menutup satu tiket.']] }),
+  makeArticle({ slug:'playbook-incident-response', title:'Incident Response: Playbook yang Tetap Berguna Saat Krisis', summary:'Struktur respons insiden dari triase, containment, preservasi bukti, komunikasi, pemulihan, hingga pembelajaran.', category:'Incident Response', publishedAt:'2026-08-05', readTime:11, cover:'incident-response', tags:['incident response','forensics','crisis'], related:['ransomware-ketahanan-pemulihan','tren-ancaman-siber-2026'], sections:[['Siapkan sebelum alarm','Tetapkan peran incident commander, teknis, legal, komunikasi, dan bisnis. Simpan kontak alternatif serta akses darurat di tempat yang tetap tersedia ketika sistem utama terganggu.'],['Triase berbasis bukti','Catat waktu, sumber alert, aset, identitas, dan tindakan yang sudah dilakukan. Bedakan observasi dari asumsi. Prioritaskan keselamatan, dampak bisnis, dan risiko meluas.'],['Containment yang proporsional','Isolasi dengan cara yang mempertahankan bukti dan tidak memutus layanan tanpa memahami dependensi. Perubahan besar perlu dicatat agar timeline investigasi tetap dapat dipercaya.'],['Pulihkan dengan kriteria','Tentukan syarat kembali beroperasi: akar akses telah ditutup, kredensial relevan dirotasi, monitoring ditingkatkan, dan pemilik bisnis menerima residual risk. Setelahnya, ubah pelajaran menjadi pekerjaan yang terlacak.']] }),
+  makeArticle({ slug:'keamanan-cloud-guardrail-yang-efektif', title:'Keamanan Cloud: Guardrail yang Efektif dan Ramah Tim', summary:'Membangun baseline identitas, logging, jaringan, data, dan deployment tanpa menghambat kecepatan engineering.', category:'Cloud Security', publishedAt:'2026-07-30', readTime:9, cover:'cloud-security', tags:['cloud','guardrail','devsecops'], related:['zero-trust-dari-prinsip-ke-kontrol','vulnerability-management-berbasis-risiko'], sections:[['Mulai dari landing zone','Pisahkan lingkungan, tetapkan kepemilikan akun atau subscription, gunakan identitas terpusat, dan kirim log penting ke lokasi yang aksesnya dibatasi. Baseline harus dapat dibuat ulang sebagai kode.'],['Default yang aman','Sediakan template deployment dengan enkripsi, private access bila sesuai, logging, tagging, dan kebijakan retensi. Guardrail yang mudah dipakai lebih efektif daripada dokumen panjang.'],['Deteksi perubahan berisiko','Pantau perubahan policy, pembuatan kredensial, penonaktifan log, paparan penyimpanan, dan perubahan jaringan. Alert perlu menyertakan konteks pemilik serta runbook verifikasi.'],['Perbaikan bersama engineering','Berikan jalur pengecualian yang memiliki alasan, pemilik, dan masa berlaku. Ukur waktu perbaikan dan pola akar masalah untuk memperbarui platform, bukan menyalahkan satu tim.']] }),
+  makeArticle({ slug:'keamanan-api-dari-inventaris-ke-monitoring', title:'Keamanan API: Dari Inventaris ke Monitoring', summary:'Praktik menjaga autentikasi, otorisasi objek, validasi input, rate limit, secret, dan telemetri sepanjang siklus API.', category:'Application Security', publishedAt:'2026-07-24', readTime:9, cover:'api-security', tags:['api','application security','secure development'], related:['penetration-testing-yang-memberi-nilai','keamanan-cloud-guardrail-yang-efektif'], sections:[['API yang tidak terlihat tidak terlindungi','Bangun inventaris dari gateway, repository, DNS, dan telemetri. Catat pemilik, data yang diproses, konsumen, versi, serta tanggal penghentian agar endpoint lama tidak tertinggal.'],['Otorisasi pada setiap objek','Validasi bahwa identitas berhak melakukan aksi pada objek yang diminta, bukan hanya sudah login. Terapkan pemeriksaan di server dan uji pergantian identifier secara otomatis.'],['Batasi penyalahgunaan','Validasi skema dan ukuran payload, terapkan rate limit berdasarkan konteks, jangan menaruh secret di klien, dan hindari detail error yang membuka struktur internal.'],['Telemetri yang berguna','Log keputusan autentikasi dan otorisasi, perubahan sensitif, serta anomali volume tanpa merekam secret atau data pribadi berlebihan. Hubungkan alert ke pemilik API dan prosedur respons.']] }),
+  makeArticle({ slug:'vulnerability-management-berbasis-risiko', title:'Vulnerability Management Berbasis Risiko', summary:'Mengubah pemindaian menjadi siklus inventaris, validasi, prioritas kontekstual, remediasi, pengecualian, dan verifikasi.', category:'Risk Management', publishedAt:'2026-07-18', readTime:10, cover:'vulnerability-management', tags:['vulnerability management','risk','patching'], related:['penetration-testing-yang-memberi-nilai','tren-ancaman-siber-2026'], sections:[['Lebih dari jumlah temuan','Jumlah vulnerability bukan ukuran risiko yang berdiri sendiri. Gabungkan tingkat keparahan dengan paparan, fungsi aset, kontrol kompensasi, kemudahan penyalahgunaan, dan konsekuensi bisnis.'],['Validasi sebelum eskalasi','Pastikan aset, versi, jalur akses, dan bukti deteksi benar. Hilangkan duplikasi dan hubungkan temuan pada pemilik layanan agar tiket tidak kehilangan konteks.'],['SLA yang bernuansa','Tetapkan target berdasarkan risiko dan sediakan proses pengecualian dengan kontrol sementara, penerima risiko, serta tanggal kedaluwarsa. Hindari SLA tunggal yang membuat tim mengejar angka.'],['Tutup dengan verifikasi','Pemindaian ulang, pengujian konfigurasi, atau retest harus membuktikan perbaikan. Analisis pola berulang untuk meningkatkan image dasar, dependency policy, dan pipeline sebelum masalah masuk produksi.']] }),
+].sort((a,b) => b.publishedAt.localeCompare(a.publishedAt))
+
+export const categories = ['Semua', ...new Set(articles.map(({ category }) => category))]
 export const getArticle = slug => articles.find(article => article.slug === slug)
+export const getRelatedArticles = article => article.related.map(getArticle).filter(Boolean)

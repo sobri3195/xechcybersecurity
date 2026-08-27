@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { services } from '../data/services'
+import { articles } from '../data/articles'
+import ArticleCard from '../components/articles/ArticleCard'
 
 const Arrow=()=> <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
 const icons=[<path d="M12 3 4.5 6v5.2c0 4.6 3.2 8.2 7.5 9.8 4.3-1.6 7.5-5.2 7.5-9.8V6L12 3Z"/>,<><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4M11 8v6M8 11h6"/></>,<><path d="M4 6h16v12H4zM8 10h2M8 14h5"/></>,<><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/></>]
@@ -10,5 +12,6 @@ export default function Home(){return <>
   </section>
   <section className="capability-section"><div className="section-heading"><div><p className="eyebrow">KAPABILITAS INTI</p><h2>Pertahanan yang bekerja<br/>sebelum ancaman datang.</h2></div><p>Setiap rekomendasi diterjemahkan menjadi prioritas yang jelas—bukan laporan panjang yang berakhir di folder arsip.</p></div><div className="cards capability-grid">{services.map((s,i)=><article key={s.title}><div className="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{icons[i]}</svg></div><span>0{i+1}</span><h3>{s.title}</h3><p>{s.text}</p><Link to="/services">Pelajari kapabilitas <Arrow/></Link></article>)}</div></section>
   <section className="insight-banner"><div><p className="eyebrow">XECH INTELLIGENCE</p><h2>Signal, bukan noise.</h2><p>Analisis ancaman dan panduan mitigasi yang ringkas untuk membantu tim Anda mengambil keputusan dengan percaya diri.</p><Link className="text-link" to="/articles">Jelajahi security insight <Arrow/></Link></div><div className="signal-map" aria-hidden="true"><span/><span/><span/><i/></div></section>
+  <section className="home-intelligence" aria-labelledby="latest-insight"><div className="section-heading"><div><p className="eyebrow">INSIGHT TERBARU</p><h2 id="latest-insight">Intelijen yang bisa dibaca,<br/>bukan sekadar CTA.</h2></div><Link className="text-link" to="/articles">Lihat semua insight <Arrow/></Link></div><div className="article-grid">{articles.slice(0,3).map(article=><ArticleCard article={article} key={article.slug}/>)}</div></section>
   <section className="cta premium-cta"><p className="eyebrow">LANGKAH BERIKUTNYA</p><h2>Jadikan keamanan sebagai<br/><span>keunggulan bisnis.</span></h2><p>Mulai dari percakapan singkat. Kami akan membantu memetakan prioritas keamanan Anda tanpa jargon yang membingungkan.</p><Link className="button light" to="/contact">Jadwalkan diskusi <Arrow/></Link></section>
   </>}
