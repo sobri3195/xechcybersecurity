@@ -1,4 +1,12 @@
-# Audit PEGASUS CTF — P0 sampai Polish
+# Audit PEGASUS CTF — Catatan Implementasi dan Risiko Tersisa
+
+> **Status per 3 September 2026:** dokumen ini mencatat perbaikan yang sudah ada,
+> tetapi bukan persetujuan produksi. Audit ulang menyeluruh dan urutan prioritas
+> terbaru berada di [`MODULE_AUDIT.md`](MODULE_AUDIT.md). Secara khusus, integritas
+> first-blood belum terbukti aman terhadap dua transaksi user yang berjalan
+> bersamaan karena lock saat ini berada pada row progress yang berbeda dan belum ada
+> unique constraint award per challenge. Test PHP yang tersedia juga belum memakai
+> MySQL atau dua koneksi konkuren.
 
 Audit ini menilai jalur pengguna, kontrak API, keamanan, integritas skor, skema, performa, aksesibilitas, dan kesiapan operasi. Status di bawah mencerminkan patch saat ini; fitur platform yang berada di luar modul ditandai sebagai tindak lanjut, bukan disamarkan sebagai fitur aktif.
 
@@ -14,7 +22,7 @@ Audit ini menilai jalur pengguna, kontrak API, keamanan, integritas skor, skema,
 
 - Direktori challenge kini membaca status/lock/attempt dari server, menghitung progres aktual, serta menjalankan endpoint `start` sebelum navigasi untuk challenge baru.
 - Leaderboard kini membaca agregat server, menangani data kosong, retry, timeout, dan hanya memakai tiga operator contoh ketika API gagal dengan label pratinjau.
-- Query rate-limit memperoleh indeks `(user_id, created_at)` yang cocok dengan pola query; indeks per-challenge tetap tersedia terpisah.
+- Query rate-limit memperoleh indeks `(user_id, created_at)` yang cocok dengan pola query; indeks per-challenge tetap tersedia terpisah. Ini belum menggantikan kebutuhan rate limit terdistribusi dan pengujian lewat proxy produksi.
 - Proxy pengembangan Vite sekarang sesuai dokumentasi backend (`/api/pegasus` ke PHP port 8080).
 
 ## P2 — reliability dan UX (diperbaiki)
@@ -36,4 +44,7 @@ Audit ini menilai jalur pengguna, kontrak API, keamanan, integritas skor, skema,
 2. **Resource challenge dan sandbox runtime** masih membutuhkan object storage, malware scanning, signed download URL, dan orchestrator container. Tombol dekoratif pada workspace tidak boleh dianggap implementasi runtime.
 3. **Dashboard, profil, sertifikat, period leaderboard, serta admin edit/import/delete** masih merupakan presentational prototype. Sebelum produksi, tambahkan endpoint terotorisasi dan acceptance test end-to-end untuk masing-masing aksi.
 4. **Migration existing deployment** memerlukan migration incremental untuk mengganti indeks submission; `migration.sql` saat ini adalah baseline instalasi baru.
-5. Jalankan integration test dengan MySQL 8 nyata untuk menguji concurrency first-blood, rollback, FK, dan isolation level; unit/contract test tanpa DB tidak dapat membuktikan perilaku tersebut.
+5. **P0 tersisa:** buat pemberian first-blood idempoten dengan lock/constraint global
+   per challenge, lalu jalankan integration test MySQL 8 dengan dua koneksi nyata.
+   Unit/contract test tanpa DB tidak dapat membuktikan concurrency, rollback, FK,
+   maupun isolation level.
