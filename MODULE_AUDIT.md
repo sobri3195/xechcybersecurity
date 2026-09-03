@@ -1,244 +1,367 @@
-# Audit Modul Xech Cyber Security
+# Audit Modul Xech Cyber Security — P0 sampai Polish
 
-Tanggal audit: 26 Agustus 2026  
-Ruang lingkup: source code, konfigurasi build/lint, routing, modul publikasi, profil pejabat, Daily Cyber Quiz, formulir kontak, SEO, aksesibilitas, keamanan deployment, dan kesiapan operasional.
+Tanggal audit: **3 September 2026**
 
-## Ringkasan eksekutif
+Branch: `work`
 
-Status saat ini **belum layak dirilis sebagai implementasi PRD terbaru**. Build produksi memang berhasil, tetapi build tersebut hanya memuat aplikasi lama dari `src/main.jsx`. Implementasi baru di `src/App.jsx`—termasuk Berita, Informasi, Pejabat, Quiz, navbar baru, SEO dinamis, dan footer baru—tidak pernah di-mount. Karena itu hasil build hijau memberi rasa aman yang keliru.
+Ruang lingkup: entry point dan routing, halaman publik, publikasi, Cyber Tools,
+Daily Cyber Quiz, formulir kontak, PEGASUS CTF (frontend dan PHP API), SEO,
+aksesibilitas, konfigurasi deployment, dependency, serta quality gate.
 
-Selain itu, dependency yang diperlukan implementasi baru (`framer-motion`, `lucide-react`, `react-helmet-async`, dan `react-hook-form`) tidak tercantum di `package.json`; lint tidak dapat dimulai karena dependency ESLint tidak tersedia; tidak ada lockfile; formulir kontak masih simulasi; canonical URL masih memakai `example.com`; dan hampir seluruh konten Informasi/Pejabat masih berupa placeholder tanpa referensi resmi.
+## Kesimpulan eksekutif
 
-## Metode dan batasan audit
+Repository **dapat di-build**, tetapi **belum siap dirilis sesuai fitur yang
+didokumentasikan**. Build hijau saat ini tidak membuktikan semua modul berfungsi:
+entry point `src/main.jsx` menjalankan shell lama dan tidak pernah me-render
+`src/App.jsx`. Akibatnya route Berita, Informasi, Pejabat, dan Quiz yang dijanjikan
+README tidak tersedia, sementara seluruh dependency yang dibutuhkan shell baru juga
+tidak ada di manifest.
 
-Audit dilakukan secara statis dan dengan pemeriksaan build/lint berikut:
+Temuan paling mendesak adalah:
+
+1. **P0 — empat modul utama adalah dead code/404** meskipun README menyatakannya
+   tersedia.
+2. **P0 — tidak ada quality gate yang dapat dijalankan secara reproducible**:
+   script lint, dependency ESLint, lockfile, test frontend, dan CI tidak tersedia.
+3. **P0 — integritas first-blood PEGASUS belum aman terhadap concurrency**;
+   transaksi mengunci progress milik pengguna, bukan satu resource global per
+   challenge, sehingga dua solve serentak dapat sama-sama menerima bonus.
+4. **P1 — kontak belum dapat menerima lead tanpa endpoint eksternal**, konten
+   pejabat/informasi masih placeholder, dan klaim statistik PEGASUS di landing page
+   adalah angka statis yang tampak operasional.
+5. **P1 — state Quiz belum tervalidasi**, sehingga data `localStorage` valid-JSON
+   dengan bentuk yang salah dapat menyebabkan crash atau hasil statistik salah.
+
+Keputusan rilis yang disarankan: **NO-GO** sampai seluruh P0 selesai dan P1 yang
+menyangkut data publik, keamanan, serta lead-generation memiliki owner dan
+acceptance test.
+
+## Metode audit dan bukti eksekusi
+
+Pemeriksaan dilakukan terhadap source yang dilacak Git, dependency terpasang,
+jalur import yang benar-benar reachable, kontrak API, dan hasil command berikut:
 
 ```bash
+npm run lint
 npm run build
-npx eslint .
 npm ls --depth=0
-rg '^import|import\\(' src -g '*.{js,jsx}'
-node --input-type=module # pemeriksaan jumlah dan keunikan data
+for f in backend/pegasus/tests/*Test.php; do php "$f"; done
+find backend -name '*.php' -print0 | xargs -0 -n1 php -l
+rg -n "TODO|FIXME|placeholder|example.com|your-domain" src public index.html
 ```
 
-Belum ada test runner, unit test, integration test, atau end-to-end test di repository. Karena aplikasi aktif tidak mengekspos modul baru, pengujian browser terhadap modul tersebut juga belum dapat dianggap representatif sampai P0 routing/dependency diselesaikan.
+Hasil aktual:
+
+- `npm run lint` **gagal** karena script `lint` tidak ada.
+- `npm run build` **lulus** (70 modul), tetapi hanya membangun graph import dari
+  shell lama; ini bukan smoke test route yang mati.
+- Ketiga PHP contract/unit test **lulus** dan seluruh file PHP lolos syntax lint.
+- `npm ls --depth=0` hanya memuat tujuh package dari `package.json`; dependency
+  shell baru dan ESLint memang tidak terpasang.
+- Tidak ada test runner frontend, browser/E2E test, accessibility test, schema
+  validator, link checker, atau workflow CI.
+
+### Matriks status modul
 
-## P0 — Release blocker / fungsi utama tidak berjalan
+| Modul | Reachable dari aplikasi aktif | Kondisi utama | Prioritas |
+| --- | --- | --- | --- |
+| Home, About, Services | Ya | Render; klaim bisnis masih perlu review | P2 |
+| Articles + detail | Ya | Render; belum ada test/schema gate | P1/P2 |
+| Journal | Ya | Render; navigasi/filter perlu E2E | P2 |
+| Cyber Tools | Ya | Banyak alat client-only; beberapa fallback/feedback kurang | P1/P2 |
+| Contact | Ya | Validasi ada, pengiriman bergantung endpoint | P1 |
+| PEGASUS landing/challenge/leaderboard | Ya | API/fallback ada; runtime sandbox belum ada | P0/P1 |
+| PEGASUS dashboard/profile/admin | Ya | Sebagian besar prototipe presentasional | P1 |
+| News | **Tidak** | Route hanya ada di `src/App.jsx` yang mati | **P0** |
+| Information | **Tidak** | Route dan link internal menjadi 404 | **P0** |
+| Officials | **Tidak** | Route mati dan seluruh data placeholder | **P0/P1** |
+| Daily Quiz | **Tidak** | Route mati; logic storage juga rapuh | **P0/P1** |
+
+## P0 — blocker rilis
 
-### P0.1 Entry point menjalankan aplikasi lama, bukan `src/App.jsx`
+### P0.1 — Dua application shell; shell yang lengkap tidak pernah di-mount
+
+`index.html` memuat `src/main.jsx`. File itu mendefinisikan `Shell` dan daftar route
+sendiri. Ia tidak mengimpor default export dari `src/App.jsx`. Route `/news`,
+`/information`, `/officials`, dan `/quiz` hanya berada di `App.jsx`, sehingga direct
+navigation dan link dari komponen mati berakhir pada route `*` shell lama.
+
+**Dampak:** dokumentasi menampilkan fitur yang tidak tersedia; build memberi false
+positive; dua navbar/footer/scroll/title system akan terus drift.
+
+**Acceptance criteria:** satu bootstrap tipis; satu application shell; smoke test
+menavigasi seluruh route, refresh direct URL, dan memastikan halaman bukan 404.
+Sebelum memilih shell baru, lakukan parity review karena shell lama juga memiliki
+`/cyber-tools`, sementara `App.jsx` tidak mendaftarkannya.
+
+### P0.2 — Dependency graph dan lint tidak reproducible
+
+Shell baru mengimpor `framer-motion`, `lucide-react`, `react-helmet-async`, dan
+`react-hook-form`, tetapi semuanya tidak ada di `package.json`. `eslint.config.js`
+mengimpor `@eslint/js`, `globals`, `eslint-plugin-react-hooks`, dan
+`eslint-plugin-react-refresh`, namun `eslint` beserta plugin tersebut juga tidak ada.
+Tidak ada script `lint` maupun lockfile repository.
+
+**Dampak:** mengaktifkan `App.jsx` langsung mematahkan build bersih; `npm ci` tidak
+dapat dipakai; hook regression dan unused variable tidak diperiksa.
+
+**Acceptance criteria:** pin dependency kompatibel, commit lockfile, tambah
+`lint`, `test`, dan `check` scripts, lalu buktikan `npm ci && npm run check` di CI.
+
+### P0.3 — First-blood PEGASUS dapat diberikan lebih dari sekali
+
+Pada submit benar, transaksi melakukan `SELECT ... FOR UPDATE` terhadap row
+`ctf_user_progress` milik user, lalu menghitung jumlah submission benar. Dua user
+yang submit bersamaan mengunci row berbeda, dapat sama-sama melihat dirinya sebagai
+correct submission pertama, lalu keduanya memperoleh event `first_blood`. Tidak ada
+unique constraint yang membatasi satu event first-blood per challenge.
+
+**Dampak:** leaderboard dan skor tidak deterministik; insentif kompetisi dapat
+dieksploitasi melalui request paralel.
+
+**Acceptance criteria:** serialisasi pada row challenge/lock khusus atau tabel award
+dengan unique key `(challenge_id, event_type)` untuk first-blood; tangani duplicate
+key secara idempoten; integration test MySQL dengan dua koneksi serentak.
+
+### P0.4 — Test yang ada belum menguji sistem nyata
+
+PHP tests saat ini lulus, tetapi berupa contract/source assertions dan unit scoring;
+tidak menyalakan router HTTP, autentikasi, atau database MySQL. Tidak ada test
+frontend. Karena itu test tidak menangkap P0.1 maupun race P0.3.
+
+**Acceptance criteria:** integration suite dengan migration database nyata, API
+requests, auth/RBAC, rollback, concurrency, serta E2E browser untuk route dan alur
+utama.
+
+## P1 — fungsi inti, keamanan, dan kebenaran data
+
+### P1.1 — Form kontak bukan kanal operasional secara default
+
+Implementasi aktif membaca `VITE_CONTACT_API_URL` dan dengan benar tidak memalsukan
+sukses bila kosong. Namun repository tidak menyediakan endpoint, health check,
+kontrak deploy, spam control, rate limit, atau integration test. Dengan konfigurasi
+default, tujuan lead-generation tidak berjalan.
+
+**Perlu:** endpoint HTTPS, validasi server-side, ukuran payload maksimum, timeout,
+idempotency/retry policy, rate limit, bot protection yang accessible, retention dan
+privacy policy nyata, monitoring delivery, serta test success/4xx/5xx/timeout.
+
+### P1.2 — Konten publikasi belum layak dipublikasikan
+
+- Enam pejabat bernama `Nama Pejabat`/`Jabatan Resmi` dan seluruhnya menggunakan
+  placeholder.
+- Delapan panduan Informasi menggunakan paragraf generik, checklist generik, dan
+  array referensi kosong.
+- News diberi label demonstrasi tetapi memiliki tanggal/penulis dan bentuk artikel
+  yang mudah dianggap faktual.
+- Nomor telepon shell baru adalah pola placeholder dan belum diverifikasi.
+
+Saat P0.1 diperbaiki, konten ini otomatis terekspos. Jangan sekadar mengaktifkan
+route tanpa feature flag/noindex. Tambahkan workflow status `draft/reviewed/published`,
+sumber primer, reviewer, `lastReviewedAt`, serta validator build-time.
 
-**Bukti:** `index.html` memuat `src/main.jsx`. File tersebut mendefinisikan `App` lokal dengan hanya route Home, About, Services, Articles, Article Detail, Contact, dan 404. Ia tidak mengimpor `src/App.jsx`.
+### P1.3 — Quiz dapat crash atau menyajikan hasil salah dari storage rusak
 
-**Dampak:** route `/news`, `/information`, `/officials`, dan `/quiz` jatuh ke 404. Seluruh navbar/footer/SEO/animasi baru juga menjadi dead code. Build hanya mentransformasi 51 modul dan output chunk tidak berisi modul-modul baru tersebut.
+`storage.get` hanya melindungi kegagalan JSON parse, bukan schema. Nilai JSON yang
+valid tetapi salah tipe membuat `.map`, `.some`, spread, atau `localeCompare` gagal.
+State lama dengan ID hilang menghasilkan kurang dari lima pertanyaan, sedangkan UI
+tetap mengindeks sampai lima. Bank aktif kurang dari lima memiliki masalah sama.
+Jawaban, score, tanggal, dan `completed` tidak divalidasi.
 
-**Perbaikan wajib:** jadikan `main.jsx` bootstrap tipis yang me-render `App` dari `./App`, bungkus dengan `HelmetProvider`, dan pertahankan `BrowserRouter`. Hapus implementasi shell lama agar tidak ada dua sumber kebenaran.
+`calculateStats` juga menamai run terakhir sebagai `currentStreak` meskipun hari
+terakhir jauh sebelum hari ini. Tombol “Tampilkan ulang hasil” hanya mengubah index
+yang tidak digunakan pada result view. Countdown tidak memicu rollover hari.
 
-### P0.2 Dependency runtime implementasi baru hilang
+**Perlu:** schema/version/migration, normalisasi/deduplikasi history, state recovery,
+explicit unavailable state jika soal <5, streak relatif hari ini/kemarin, rollover
+event, share fallback, dan unit tests untuk corrupt/legacy/boundary dates.
 
-`src/App.jsx` dan komponennya mengimpor:
+### P1.4 — PEGASUS menggabungkan produk nyata dan prototipe
 
-- `framer-motion`
-- `lucide-react`
-- `react-helmet-async`
-- `react-hook-form`
+Challenge list/detail dan leaderboard mencoba API, tetapi landing menampilkan
+“1.284 operator aktif” dan “48.920 flag ditemukan” sebagai angka statis tanpa label
+demo. Dashboard, profil, sertifikat, admin edit/delete/import/export buttons, download
+resource, terminal, serta reset environment belum terhubung penuh. Sandbox runtime,
+object storage, malware scanning, signed URL, isolation, quota, TTL, dan cleanup
+belum ada di repository.
 
-Tidak satu pun tercantum di `dependencies`. Build saat ini lolos hanya karena modul yang mengimpornya tidak reachable dari entry point.
+**Risiko:** pengguna menganggap environment aman/online dan operasi berhasil padahal
+sebagian hanya visual. Semua aksi nonaktif harus benar-benar `disabled` dan berlabel
+preview; statistik harus berasal dari API atau dilabel demo.
 
-**Dampak:** setelah P0.1 diperbaiki, build akan gagal resolve module. Instalasi production yang bersih juga tidak bisa menjamin dependency tersedia.
+### P1.5 — Challenge start di frontend dapat menghasilkan state menyesatkan
 
-**Perbaikan wajib:** tambahkan dependency dengan versi terpin, buat lockfile, lakukan instalasi bersih, lalu build ulang.
+Detail mengambil challenge lalu memanggil `startChallenge` bila status
+`not_started`, tetapi kegagalan start terjadi di promise chain yang sama dengan fetch.
+Catch kemudian mengganti challenge valid menjadi fallback demo bila ID ada. Error
+auth, prerequisite, network, dan start tidak dibedakan, sehingga pengguna bisa
+diturunkan ke preview meski server baru saja memberi data valid.
 
-### P0.3 Toolchain lint tidak reproducible dan lint gagal sebelum menganalisis source
+Pisahkan state fetch/start, tampilkan error berdasarkan status, dan jangan mengubah
+data server menjadi demo setelah kegagalan mutasi.
 
-`eslint.config.js` mengimpor `@eslint/js`, `globals`, `eslint-plugin-react-hooks`, dan `eslint-plugin-react-refresh`, tetapi semuanya hilang dari `devDependencies`; bahkan `eslint` dan script `lint` juga tidak ada.
+### P1.6 — API hardening dan operasi belum lengkap
 
-**Dampak:** acceptance criterion “build dan lint lulus” tidak terpenuhi dan regression React Hooks/unused variables tidak terdeteksi.
+- Token disimpan sebagai SHA-256 tanpa server-side pepper. Entropy minimum regex
+  membantu, tetapi issuance/revocation/rotation, token scope, last-used, dan brute
+  force monitoring tidak tersedia di repository.
+- Semua endpoint, termasuk categories, membutuhkan auth; pastikan ini sengaja karena
+  UI publik otomatis jatuh ke demo tanpa token.
+- Rate limit memakai database count per menit, belum mencakup start/hint/login dan
+  belum memiliki strategi distributed/proxy IP yang terdokumentasi.
+- `config.php` perlu dipastikan fail-closed untuk production secrets dan origin.
+- Tidak ada CSRF concern untuk Bearer token, tetapi penyimpanan token di browser dan
+  mitigasi XSS belum terdokumentasi.
 
-**Perbaikan wajib:** tambahkan seluruh dependency lint, pin versi kompatibel, tambahkan script `lint`, dan jalankan di CI.
+### P1.7 — SEO memiliki tiga sumber URL dan placeholder domain
 
-### P0.4 Tidak ada lockfile
+`index.html`, `robots.txt`, dan komponen detail news masih menggunakan
+`your-domain.example`/`example.com`, sedangkan helper SEO memiliki konfigurasi lain.
+Shell aktif hanya mengubah `document.title`; ia tidak memasang canonical, description,
+Open Graph, noindex untuk invalid slug, atau provider metadata baru.
 
-Repository tidak memiliki `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`, maupun `pnpm-lock.yaml`.
+Tentukan satu `VITE_SITE_URL` tervalidasi, hasilkan robots/sitemap saat build, pasang
+metadata per route, dan gunakan prerender/SSR bila indexing publikasi merupakan
+kebutuhan. SPA rewrite tetap mengirim HTTP 200 untuk invalid slug.
 
-**Dampak:** `npm ci` tidak dapat digunakan, dependency transitif tidak deterministik, audit supply-chain dan rollback build melemah.
+## P2 — kelengkapan fitur dan reliability
 
-**Perbaikan wajib:** hasilkan dan commit lockfile dari versi Node/npm yang ditetapkan, lalu gunakan `npm ci` di CI/deployment.
+### P2.1 — Filter, pagination, dan URL state
 
-## P1 — Kritis sebelum production
+News belum memiliki pagination/loading state; featured item diduplikasi dalam list.
+Information juga menduplikasi featured item. Query parameter filter tidak
+dinormalisasi dengan allow-list dan nilai invalid dapat memberi empty state tanpa
+penjelasan. Reset/search update dapat memenuhi browser history.
 
-### P1.1 Form kontak tidak pernah mengirim lead
+### P2.2 — Related content dan model data
 
-Baik halaman Contact lama maupun `ContactForm` baru hanya menunggu timer dan menampilkan sukses. `VITE_CONTACT_API_URL` hanya disebut dalam komentar/README dan tidak pernah dibaca.
+Related News hanya memprioritaskan equality kategori dengan comparator boolean;
+Information mengambil dua record pertama. Tidak ada ranking tag/topik, tie-break,
+status publikasi, atau review freshness. Tambahkan schema bersama dengan ID/slug
+unik, ISO date, safe URL, alt text, source, dan referential-integrity validation.
 
-**Dampak:** tujuan lead-generation utama gagal; pengguna dapat percaya permintaan sudah diproses padahal tidak ada data yang dikirim.
+### P2.3 — Penyimpanan lokal lintas modul belum konsisten
 
-**Kebutuhan:** endpoint HTTPS, validasi server-side, timeout/cancel, mapping error, retry yang aman, rate limiting, spam protection, consent/privacy link, observability, dan pesan yang tidak mengklaim terkirim sebelum server mengonfirmasi. Nomor telepon placeholder harus dihapus atau diverifikasi.
+Quiz dan checklist tidak memakai validator/version yang kuat. Sebagian Cyber Tools
+memiliki version, tetapi progress learning masih menggunakan indeks array; perubahan
+urutan materi memindahkan arti progress lama. Kegagalan quota/private mode sering
+diabaikan meskipun `storage.set` mengembalikan `false`.
 
-### P1.2 SEO menggunakan domain placeholder dan provider belum terpasang
+Gunakan stable item ID, namespace/version, migration, max-size/TTL bila relevan, dan
+feedback saat penyimpanan gagal.
 
-Komponen SEO membuat canonical dan Open Graph URL dari `https://example.com`; JSON-LD detail berita juga memakai domain tersebut, sedangkan `index.html` memakai `https://your-domain.example`. `Helmet` memerlukan `HelmetProvider`, tetapi entry point aktif tidak menyediakannya.
+### P2.4 — Clipboard dan share belum reliable
 
-**Dampak:** canonical salah, structured data tidak konsisten, dan setelah modul diaktifkan Helmet berpotensi error/tidak bekerja sesuai desain.
+Beberapa tombol langsung memanggil Clipboard API tanpa mengecek availability atau
+memberi feedback sukses/gagal. Clipboard dapat ditolak di insecure context atau oleh
+permission policy. Gunakan Web Share bila tersedia, Clipboard fallback, lalu manual
+copy fallback; semua hasil diumumkan melalui live region.
 
-**Kebutuhan:** satu `VITE_SITE_URL` tervalidasi, satu helper URL, `HelmetProvider`, OG image, Twitter metadata, dan strategi prerender/SSR untuk crawler yang tidak mengeksekusi SPA.
+### P2.5 — Detail 404 dan error boundary
 
-### P1.3 Konten berisiko menyesatkan dan melanggar NFR konten
+Invalid News/Information/Official detail tidak memasang metadata `noindex` khusus.
+Tidak ada root error boundary atau route-level recovery UI; exception render dari
+storage/data dapat mengosongkan aplikasi. Tambahkan error boundary dengan retry dan
+privacy-safe reporting.
 
-- Seluruh profil pejabat adalah “Nama Pejabat/Jabatan Resmi” placeholder.
-- Seluruh delapan panduan Informasi memakai teks generik yang sama dan `references: []`.
-- Halaman Informasi mengklaim “Referensi” tetapi hanya menampilkan pesan, bukan daftar tautan sumber.
-- Artikel memuat CVE bertanggal 2026 dan nama penulis/role; validitas klaim tidak dapat dibuktikan dari workflow repository.
+### P2.6 — Data/API loading consistency
 
-**Dampak:** situs keamanan dapat menyebarkan klaim yang tidak terverifikasi dan merusak kepercayaan. Ini bertentangan dengan `NFR-CONTENT-001`.
+Modul publikasi membaca data sinkron sehingga tidak memiliki kontrak loading/error
+untuk migrasi CMS. PEGASUS telah memiliki sebagian state tersebut tetapi semantics
+fallback berbeda antarhalaman. Definisikan state machine konsisten: idle, loading,
+success-empty, success-data, unauthorized, forbidden, unavailable, dan retrying.
 
-**Kebutuhan:** jangan publikasikan route placeholder ke pengguna/crawler; terapkan schema data dan validasi sumber; simpan URL, penerbit, tanggal akses, status review, reviewer, dan last-reviewed; verifikasi semua identitas, kontak, statistik, CVE, versi patch, serta klaim eksploitasi terhadap sumber primer.
+## P3 — maintainability dan operasional
 
-### P1.4 Daily Quiz rapuh terhadap data/storage rusak
+### P3.1 — Duplikasi shell dan stylesheet
 
-- State dari `localStorage` dipercaya tanpa validasi schema.
-- Jika `questionIds` tersimpan sebagian/tidak valid, `chosen` bisa kurang dari lima; UI tetap mengindeks lima soal dan dapat crash saat `item.question` dibaca.
-- Jika bank soal aktif kurang dari lima, masalah yang sama terjadi.
-- Riwayat dipercaya sebagai array; nilai JSON valid dengan tipe salah dapat membuat `.some`, `.filter`, atau spread gagal.
-- Statistik “current streak” sebenarnya streak terakhir dalam history, walau pengguna sudah melewatkan banyak hari; ini bukan current streak kalender.
-- Tombol “Tampilkan ulang hasil” hanya mengubah indeks yang tidak dipakai pada result view.
-- Countdown tidak diberi `onNewDay`, sehingga pergantian hari tidak menyegarkan kuis.
-- Share quiz hanya mengandalkan Clipboard API, tanpa Web Share/fallback untuk insecure context atau izin ditolak.
+Ada `src/main.jsx` versus `src/App.jsx`, navbar/footer lama versus baru, serta
+`styles.css` versus `index.css`. Banyak file JSX ditulis satu baris, menghambat review,
+blame, stack trace, dan merge. Pilih satu design system, hapus dead code setelah parity
+test, dan terapkan formatter.
 
-**Kebutuhan:** schema validation/migration storage, fallback selection selalu tepat lima atau explicit unavailable state, deduplikasi history, validasi tanggal/skor/answer, perhitungan streak relatif terhadap hari ini/kemarin, real result navigation, dan rollover hari yang aman.
+### P3.2 — Tidak ada CI/release gate
 
-### P1.5 Security headers belum memadai untuk situs keamanan
-
-Konfigurasi sudah memiliki `nosniff`, frame denial, referrer policy, dan permissions policy, tetapi belum memiliki Content-Security-Policy dan HSTS. Tidak ada kebijakan `connect-src` untuk endpoint kontak atau pembatasan script/image/font yang terdokumentasi.
-
-**Kebutuhan:** tambahkan CSP yang diuji (awali report-only), HSTS setelah seluruh subdomain siap HTTPS, serta `Cross-Origin-Opener-Policy`/kebijakan lain berdasarkan kebutuhan. Sesuaikan CSP dengan JSON-LD inline atau gunakan nonce/hash.
-
-## P2 — Fitur PRD belum lengkap / correctness
-
-### P2.1 News belum memiliki pagination dan loading state
-
-`FR-NEWS-001` mensyaratkan pagination; implementasi merender seluruh hasil. Acceptance criteria juga meminta loading state, tetapi data seluruhnya sinkron dan tidak ada skeleton/loading/error boundary per modul.
-
-### P2.2 Featured content diduplikasi
-
-Saat filter default, Featured News tampil di bagian unggulan dan item yang sama kembali muncul di “Semua Berita”. Hal serupa terjadi pada Informasi: featured cards juga tetap ada di hasil seluruh panduan.
-
-### P2.3 Parameter URL tidak divalidasi
-
-Nilai `sort`, kategori, tahun, topik, level, tipe, unit, status, dan periode dari URL diterima apa adanya. `sort` yang bukan `old` diam-diam dianggap terbaru, sementara filter invalid menghasilkan empty state.
-
-**Kebutuhan:** normalisasi allow-list, canonical query ordering, dan tombol reset yang konsisten memakai `{ replace: true }` agar input pencarian tidak memenuhi history browser.
-
-### P2.4 Invalid detail route tidak punya metadata/HTTP semantics yang tepat
-
-Detail News/Information/Official yang tidak ditemukan menampilkan UI kontekstual, tetapi tidak memasang title/noindex khusus dan sebagai SPA tetap dikirim dengan HTTP 200 dari rewrite.
-
-**Kebutuhan:** minimal metadata `noindex`/title 404; idealnya SSR/edge routing mengembalikan status 404.
-
-### P2.5 Related content terlalu naif
-
-News hanya memprioritaskan kategori lewat comparator boolean dan Information hanya mengambil dua item pertama. Tidak ada relevansi tag/topik, kestabilan tie-break eksplisit, atau pengecualian draft/unpublished.
-
-### P2.6 Model data artikel tidak konsisten
-
-Objek artikel tidak memiliki `id`; pemeriksaan integritas menunjukkan tiga artikel tetapi hanya satu nilai unik untuk `id` (semuanya `undefined`). Modul lain memakai `id` secara konsisten.
-
-**Kebutuhan:** schema bersama atau validator build-time untuk required fields, slug/ID unik, tanggal ISO, URL aman, alt text, status publikasi, dan referential integrity.
-
-### P2.7 Tidak ada batas/versi untuk penyimpanan checklist
-
-Checklist menyimpan indeks array. Bila editor mengubah urutan item, progres lama menunjuk item yang salah. Key per slug juga tidak memiliki schema version/TTL.
-
-**Kebutuhan:** item ID stabil, storage version, migration, validasi tipe, dan feedback bila penyimpanan browser gagal.
-
-### P2.8 Aksesibilitas perlu dilengkapi
-
-- Progress quiz hanya visual dan teks; belum menggunakan `<progress>` atau ARIA value semantics.
-- Mobile menu tidak mengunci/mengelola fokus dan tidak otomatis tutup pada perubahan route selain klik link.
-- Dropdown desktop tidak memiliki pengelolaan fokus arrow-key/menu yang eksplisit.
-- Beberapa status/reset tidak memiliki konfirmasi live yang konsisten.
-- Error form Contact lama untuk service/message tidak dihubungkan dengan `aria-describedby`.
-
-**Kebutuhan:** audit keyboard/screen reader nyata (NVDA/VoiceOver), focus return, focus visibility, automated axe, contrast, zoom 200–400%, dan target 360px.
-
-## P3 — Maintainability dan operasional
-
-### P3.1 Dua aplikasi dan dua design system hidup bersamaan
-
-Ada `src/index.css` dan `src/styles.css`, `src/App.jsx` dan App lokal di `main.jsx`, Contact lama dan `ContactForm` baru, serta shell navbar/footer lama dan baru. Duplikasi membuat perubahan mudah diterapkan ke file yang tidak pernah dipakai.
-
-**Kebutuhan:** pilih satu application shell dan satu stylesheet entry; hapus/migrasikan dead code setelah coverage memastikan parity.
-
-### P3.2 Hampir semua modul baru ditulis satu baris
-
-Banyak file JSX menggabungkan imports, fungsi, dan seluruh markup pada satu baris. Ini menghambat review, blame, citation, debugging stack trace, dan merge.
-
-**Kebutuhan:** jalankan formatter (Prettier atau Biome), tetapkan aturan di CI, dan pecah logic kompleks seperti Quiz ke reducer/hooks/service teruji.
-
-### P3.3 Tidak ada CI dan matriks quality gate
-
-Repository tidak memiliki test scripts maupun workflow yang menegakkan install bersih, lint, unit, build, link check, accessibility, dan E2E.
-
-**Minimum gate:**
+Minimum gate yang disarankan:
 
 1. `npm ci`
-2. `npm run lint`
-3. `npm test -- --run`
-4. `npm run build`
-5. Playwright smoke test seluruh route + invalid slug + refresh
-6. axe accessibility scan
-7. schema/content/link validation
+2. `npm run format:check`
+3. `npm run lint`
+4. unit/component tests dengan coverage threshold yang realistis
+5. PHP syntax + unit + MySQL integration tests
+6. `npm run build`
+7. Playwright route/form/filter/storage/PEGASUS smoke tests
+8. axe accessibility scan, link check, dan content-schema validation
 
-### P3.4 Error handling dan observability belum ada
+### P3.3 — Observability tidak tersedia
 
-Tidak ada React error boundary, route-level error UI, logging terstruktur, error reporting, health signal endpoint kontak, ataupun privacy-aware analytics yang benar-benar diimplementasikan.
+Tidak ada frontend error reporting, correlation/request ID, API structured log,
+health/readiness endpoint, metrics, alerting, atau runbook incident/rollback. Log PHP
+hanya menulis message exception. Hindari logging token, flag mentah, PII kontak, atau
+jawaban sensitif saat observability ditambahkan.
 
-### P3.5 Dokumentasi tidak sinkron
+### P3.4 — Dokumentasi drift
 
-README menyebut modul baru seolah tersedia, menyebut lint/build harus dijalankan tetapi tidak menyediakan lint script, dan bagian License mencantumkan library yang bahkan tidak ada dalam manifest. Struktur proyek yang didokumentasikan juga belum mencakup kondisi aktual secara lengkap.
+README menyebut route baru tersedia, form terintegrasi, lint/build sebagai workflow,
+dan library yang tidak ada dalam manifest. `PEGASUS_AUDIT.md` sebelumnya menandai
+first-blood dan sejumlah area sebagai selesai tanpa concurrency integration proof.
+Dokumentasi harus menjadi bagian quality gate, bukan klaim manual.
 
-## P4 — Polish
+## P4 — polish, aksesibilitas, dan performa
 
-- Konsistenkan bahasa menu (`Home/About/Services/Articles/Contact`) dengan konten Indonesia atau sediakan i18n yang nyata.
-- Format seluruh tanggal dengan locale Indonesia; halaman Informasi/Pejabat masih menampilkan raw string.
-- Tambahkan image dimensions/aspect ratio, lazy-loading untuk gambar below-the-fold, dan error fallback.
-- Tambahkan active state publikasi parent saat berada di child route.
-- Debounce pencarian bila data berpindah ke API dan pertahankan fokus setelah reset/filter.
-- Tambahkan empty state yang dapat ditindaklanjuti secara konsisten di semua direktori.
-- Sediakan print styles untuk panduan/checklist dan share metadata per artikel.
-- Audit copy: gunakan “Kuis” secara konsisten, jelaskan demonstrasi sebelum CTA, dan hindari klaim “diperbarui setiap hari” bila data hanya diacak dari bank statis.
-- Optimalkan bundle setelah aplikasi baru benar-benar masuk build; ukuran build saat ini tidak dapat dipakai sebagai baseline modul baru.
+- Konsistenkan bahasa: `Home`, `Insight`, `Journal`, `Contact`, `Quiz`, dan istilah
+  Indonesia bercampur tanpa strategi i18n.
+- Mobile menu shell baru belum memiliki focus trap/focus return/body scroll lock;
+  policy modal footer hanya fokus awal, belum trap/return/close Escape.
+- Dropdown publikasi belum menyediakan keyboard arrow navigation dan parent active
+  state ketika berada pada child publication route.
+- Progress quiz sebaiknya menggunakan `<progress>` atau `role="progressbar"` dengan
+  `aria-valuemin/max/now`; lakukan audit NVDA/VoiceOver, zoom 400%, dan 360 px.
+- Gunakan format tanggal `id-ID` konsisten; jangan tampilkan raw ISO/date placeholder.
+- Tambahkan width/height atau aspect ratio stabil, lazy loading below-the-fold,
+  decoding hint, dan image error fallback.
+- Tambahkan print style khusus panduan/checklist, focus-visible yang konsisten,
+  reduced-motion coverage, contrast check, dan target sentuh minimal 44×44.
+- Pecah bundle berdasarkan route tetap baik, tetapi tetapkan performance budget dan
+  ukur setelah shell final aktif; angka build saat ini bukan baseline fitur lengkap.
+- Hindari copy “diperbarui setiap hari” untuk quiz bila yang berubah hanya pilihan
+  seeded dari bank statis; jelaskan timezone dan waktu rollover.
 
-## Urutan remediation yang direkomendasikan
+## Rencana remediasi berurutan
 
-### Fase 0 — Pulihkan kebenaran build (hari 1)
+### Fase 0 — pulihkan kebenaran build
 
-1. Integrasikan `src/App.jsx` ke entry point.
-2. Tambahkan seluruh dependency runtime/dev dan lockfile.
-3. Tambahkan lint script, formatter, dan install/build bersih.
-4. Tambahkan smoke test yang menyatakan semua route PRD bukan 404.
+1. Pilih satu shell dan buat route parity map, termasuk `/cyber-tools`.
+2. Tambah/pin dependency, lockfile, lint/format/test scripts.
+3. Tambah smoke test semua route dan direct refresh.
+4. Perbaiki first-blood dengan constraint/locking dan concurrency integration test.
 
-### Fase 1 — Aman untuk staging (hari 2–4)
+### Fase 1 — staging aman
 
-1. Perbaiki/validasi storage dan seluruh edge case Quiz.
-2. Konfigurasi site URL tunggal + HelmetProvider + metadata invalid route.
-3. Sembunyikan konten placeholder dari production/indexing.
-4. Implementasikan endpoint kontak atau ubah CTA secara tegas menjadi demo non-submission.
-5. Tambahkan error boundary, CSP report-only, dan test accessibility dasar.
+1. Feature-flag/noindex konten placeholder; verifikasi kontak dan seluruh klaim.
+2. Validasi/migrasi storage Quiz dan perbaiki rollover/streak.
+3. Pisahkan API fetch/start state PEGASUS; label/nonaktifkan seluruh prototipe.
+4. Satukan site URL/metadata dan tambah error boundary.
+5. Integrasikan endpoint kontak beserta security/operational controls.
 
-### Fase 2 — Penuhi PRD (minggu 2)
+### Fase 2 — kelengkapan produk
 
-1. Pagination, loading/error state, URL validation, related ranking.
-2. Content schema, sumber resmi, workflow editorial, dan link checker.
-3. Unit test utility + integration test form/filter/checklist/quiz + E2E route/refresh.
-4. Tentukan SSR/prerender untuk SEO dan HTTP 404 yang benar.
+1. Pagination, filter allow-list, ranking related, schema/source workflow.
+2. Implementasikan atau hapus CTA PEGASUS yang belum mempunyai backend/runtime.
+3. Tambah browser, accessibility, API, database, link, dan content tests.
 
-### Fase 3 — Hardening dan polish
+### Fase 3 — hardening dan polish
 
-1. Formatter/refactor dead code dan design system.
-2. Browser/device/screen-reader matrix, performance budget, image optimization.
-3. Observability, privacy consent, analytics terukur, backup/rollback content.
-4. Security review CSP/HSTS/dependency/license dan release checklist.
+1. Refactor/format dead code dan satukan design system.
+2. Performance/accessibility/device matrix dan observability.
+3. Security review token lifecycle, CSP, CORS, secrets, dependencies, backup,
+   migration, rollback, dan incident runbook.
 
-## Definition of done minimum
+## Definisi selesai untuk release
 
-Rilis baru boleh dianggap siap ketika install bersih deterministik; lint, unit, integration, E2E, accessibility, dan build lulus; seluruh route PRD dapat dibuka dan di-refresh; tidak ada placeholder/claim tanpa sumber di production; form benar-benar mendapat acknowledgement server; Quiz tahan storage korup dan pergantian hari; canonical memakai domain produksi; invalid route memiliki noindex/404 semantics; serta ada rollback dan monitoring.
+Release baru dapat dinyatakan siap ketika install bersih reproducible; seluruh route
+teruji dan reachable; tidak ada konten/nomor/statistik placeholder tanpa label;
+contact delivery terpantau; skor first-blood terbukti tunggal pada concurrency test;
+Quiz pulih dari storage rusak; seluruh aksi PEGASUS jujur tentang capability; lint,
+unit, integration, E2E, accessibility, schema, dan build menjadi required CI checks;
+serta semua P0 dan P1 memiliki test regresi.
